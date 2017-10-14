@@ -142,6 +142,7 @@ BsmtFinType2_Rec,-0.010303579
 GarageType_2Types,-0.010674343
 PoolQC_TA,-0.011255776
 LotConfig_FR2,-0.011522708
+Unnamed: 0,-0.012604717
 Condition1_RRNe,-0.013430822
 MS_150,-0.01357505
 Condition1_RRAn,-0.01382476
@@ -202,8 +203,8 @@ GarageCond_Po,-0.054523944
 BsmtHalfBath,-0.056146439
 MasVnrType_BrkCmn,-0.056594825
 Heating_Grav,-0.058145457
-MSZoning_I (all),-0.059342909
 Utilities_NoSewr,-0.059342909
+MSZoning_I (all),-0.059342909
 MSZoning_RH,-0.06052274
 SaleType_ConLw,-0.066153098
 LotConfig_Inside,-0.06763815
@@ -245,6 +246,7 @@ HeatingQC_Gd,-0.119864076
 ExterQual_Fa,-0.123953984
 Exterior2nd_AsbShng,-0.124509783
 Neighborhood_IDOTRR,-0.126530013
+OQ_2,-0.127211296
 ExterCond_Fa,-0.127352542
 EnclosedPorch,-0.128426482
 Exterior2nd_MetalSd,-0.129704265
@@ -267,6 +269,7 @@ OC_4,-0.156892835
 BsmtFinType1_Rec,-0.158796533
 Exterior1st_Wd Sdng,-0.162080425
 Exterior2nd_Wd Sdng,-0.164699208
+OC_3,-0.166444854
 LandContour_Lvl,-0.171710981
 GarageQual_Fa,-0.177462312
 Fence_MnPrv,-0.190510804
@@ -293,3 +296,25 @@ GarageFinish_Unf,-0.425945384
 BsmtQual_TA,-0.476660263
 KitchenQual_TA,-0.512682184
 ExterQual_TA,-0.592078027
+MSZoning_A (agr),
+Neighborhood_GrnHill,
+Neighborhood_Landmrk,
+Condition2_PosA,
+Condition2_RRAe,
+Condition2_RRAn,
+Condition2_RRNn,
+RoofMatl_Metal,
+RoofMatl_Roll,
+Exterior1st_AsphShn,
+Exterior1st_CBlock,
+Exterior1st_PreCast,
+Exterior2nd_CBlock,
+Exterior2nd_PreCast,
+ExterCond_Po,
+HeatingQC_Po,
+GarageQual_Ex,
+GarageCond_Ex,
+PoolQC_Fa,
+MiscFeature_Othr,
+MiscFeature_TenC,
+OC_2,
