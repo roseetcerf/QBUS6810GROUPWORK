@@ -2,9 +2,9 @@
 
 Notation: 
  - comment, ~.  date & initial. Behind.      ex:  xxxxxx    ~xy. 15 
-- readed, $ (smile).  %(xy).  Ahead.           ex: $  or % - porpotion of +ve response in training set: 16.582%
-- highlight/request, @.                                            ex: @ --> @@ --> @@@ 
-- saved ¡¾csv¡¿ 
+- readed, $ (smile).  %(xy).  Ahead.         ex: $  or % - porpotion of +ve response in training set: 16.582%
+- highlight/request, @.                      ex: @ --> @@ --> @@@ 
+- saved ã€csvã€‘ 
 
 Outline:
 
@@ -13,25 +13,25 @@ Part 1 : Biz understanding
 Part 2: Data understanding (all data)
 	- For Y: 
 		- porpotion of +ve response in training set: 16.582% 
-		- correlation to Y(response).    ¡¾corr to Response.csv  & corr to Response(abs).csv¡¿ 
+		- correlation to Y(response).    ã€corr to Response.csv  & corr to Response(abs).csvã€‘ 
 	- For X:
-		- Descriptive analysis + skew & kurt.  ¡¾descriptive for X_train.csv¡¿
+		- Descriptive analysis + skew & kurt.  ã€descriptive for X_train.csvã€‘
 
 Part 3: Data preparation (variable selection)
 	- PCA
 	- CV (forward subset method)
-	- Logistic Regression. ¡¾¡®logit_sum.excl¡¯, 'logit_coef.csv' & 'logit_coef_asb.csv'¡¿ 
-		- Ä£ĞÍËµÊÇµÄ15¸ö£¬coefÊÇÅÅ¹ıĞòµÄ£¬±ğËãintercept
-		- http://blog.yhat.com/posts/logistic-regression-and-python.html £¨¿É²Î¿¼Âß¼­&½âÊÍ£©
-		- ÎÒÓÃtut10µÄ uni logit_regµÄÍ¼»­ÁË¿´ÁËÒ»¸ö£¬Ã»ÓĞÒ»¸öÊÇºÃµÄ¡¤¡¤¡¤¡¤¡¤ 
-	- Decision Tree ¡¾'tree_importency.csv'¡¿
-		- Ğ§¹ûÌØ±ğºÃ£¬ÏÈÓÃÁËGridSearchËÑ³öÀ´optimal depthÊÇ4¸ö
-		- È»ºóÕÒ³öÀ´ÁË4¸ö·Ç0µÄ£¬´Ó´óµ½Ğ¡ÊÇLTFREDAY, Days, Fredays, Fre
-		- http://songhuiming.github.io/pages/2016/07/12/variable-selection-in-python/ £¨²ÎÕÕ×Å¿É½âÊÍ£©
-		- ÎÊÌâÊÇ£¬tree¸úlogitÑ¡³öÀ´µÄvariablesÍêÈ«²»¶Ô×Å£¬ËùÒÔÒªÓÃÁ½¸öµÄ»°£¬µÄÏëÏëÈçºÎ½âÊÍ
+	- Logistic Regression. ã€â€˜logit_sum.exclâ€™, 'logit_coef.csv' & 'logit_coef_asb.csv'ã€‘ 
+		- æ¨¡å‹è¯´æ˜¯çš„15ä¸ªï¼Œcoefæ˜¯æ’è¿‡åºçš„ï¼Œåˆ«ç®—intercept
+		- http://blog.yhat.com/posts/logistic-regression-and-python.html ï¼ˆå¯å‚è€ƒé€»è¾‘&è§£é‡Šï¼‰
+		- æˆ‘ç”¨tut10çš„ uni logit_regçš„å›¾ç”»äº†çœ‹äº†ä¸€ä¸ªï¼Œæ²¡æœ‰ä¸€ä¸ªæ˜¯å¥½çš„Â·Â·Â·Â·Â· 
+	- Decision Tree ã€'tree_importency.csv'ã€‘
+		- æ•ˆæœç‰¹åˆ«å¥½ï¼Œå…ˆç”¨äº†GridSearchæœå‡ºæ¥optimal depthæ˜¯4ä¸ª
+		- ç„¶åæ‰¾å‡ºæ¥äº†4ä¸ªé0çš„ï¼Œä»å¤§åˆ°å°æ˜¯LTFREDAY, Days, Fredays, Fre
+		- http://songhuiming.github.io/pages/2016/07/12/variable-selection-in-python/ ï¼ˆå‚ç…§ç€å¯è§£é‡Šï¼‰
+		- é—®é¢˜æ˜¯ï¼Œtreeè·Ÿlogité€‰å‡ºæ¥çš„variableså®Œå…¨ä¸å¯¹ç€ï¼Œæ‰€ä»¥è¦ç”¨ä¸¤ä¸ªçš„è¯ï¼Œçš„æƒ³æƒ³å¦‚ä½•è§£é‡Š
 	- Recursive feature eliminaation w/ cv = 5
-		-Õâ¸ö¾Í±È½ÏŞÏŞÎÁË£¬ÅÜ³öÀ´Ëµ50¸ö¶¼ÊÇÏà¶Ô¶ÀÁ¢µÄ£¬¶¼ÊÇÖØÒªµÄ¡£¡£¡£¡£
-		- http://scikit-learn.org/stable/modules/feature_selection.html#rfe (²Î¿¼µÄ½âÊÍ)
+		-è¿™ä¸ªå°±æ¯”è¾ƒå°´å°¬äº†ï¼Œè·‘å‡ºæ¥è¯´50ä¸ªéƒ½æ˜¯ç›¸å¯¹ç‹¬ç«‹çš„ï¼Œéƒ½æ˜¯é‡è¦çš„ã€‚ã€‚ã€‚ã€‚
+		- http://scikit-learn.org/stable/modules/feature_selection.html#rfe (å‚è€ƒçš„è§£é‡Š)
 
 
 Part 4: Modeling (Confidence interval for the expected gross profit from a customer for each model)
