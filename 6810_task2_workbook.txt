@@ -22,7 +22,7 @@ Part 2: Data understanding (all data)
 Part 3: Data preparation (variable selection)
 	- PCA
 		- 需要9个components，更多的几乎没有再有提高
-	- forward subset method
+	- forward subset method： 有20个features被选中
 	- Logistic Regression. 【‘logit_sum.excl’, 'logit_coef.csv' & 'logit_coef_asb.csv'】 
 		- 模型说是的15个，coef是排过序的，别算intercept
 		- http://blog.yhat.com/posts/logistic-regression-and-python.html （可参考逻辑&解释）
