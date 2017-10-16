@@ -39,3 +39,17 @@ for i in range(50):
 #    sns.despine()
 #    plt.show()
 
+
+
+# scatter plot for FRE , Classes, & LTFREDAY
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+plt.scatter(y_train, X_train['FRE'])
+plt.title ("FRE vs. Response")
+plt.xlabel ('Response')
+plt.ylabel ('FRE')
+plt.autoscale(tight=True)
+plt.grid()
+plt.show()
