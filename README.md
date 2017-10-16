@@ -1,4 +1,3 @@
-# QBUS6810GROUPWORK
-QBUS6810 GROUP WORK
+# QBUS6810GROUPWORK - Task 2
 
 Always Open "Workbook" & Trace recods.
