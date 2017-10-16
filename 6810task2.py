@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 16 14:02:40 2017
+
+@author: xinyu
+"""
+
 # -*- coding: utf-8 -*-
 """
 Created on Sat Oct 14 18:02:10 2017
@@ -21,6 +29,7 @@ phone = pd.get_dummies(X['VALPHON'], drop_first=True) # Get dummy
 phone = phone.rename(columns = {'Y':'VALPHON'})
 
 X = X.drop('VALPHON', axis=1)
+X = X.drop('HHKEY', axis=1)
 
 # Cleaned Variables & target
 X = pd.concat([X, phone], axis=1)
@@ -37,6 +46,15 @@ y_test.to_csv('Clean y_test.csv')
 
 
 ### Data understanding ###
+import scipy as sp
+print(X_train.shape)
+
+
+
+
+
+
+
 # For Y:
 # +ve %
 print("Proportion of positive response in the training set: {0:.3f}%"
@@ -122,6 +140,17 @@ print("Optimal number of features : %d" % rfecv.n_features_)
 
 
 
+# Forward selection
+from statlearning import forward  # Forward method
+
+fwd = forward()
+fwd.fit(X_train, y_train)
+
+idx = fwd.subset
+print(idx)
+
+X_train[idx].head(5)
+
 
 # Forward variable selection　　［还没看懂呢］
 import statsmodels.formula.api as smf
@@ -151,8 +180,31 @@ def importance_foreward(indata = df, yVar = yvar, xVar = xvar, stopn = 4):
 
 
 
+# PCA
+# https://www.analyticsvidhya.com/blog/2016/03/practical-guide-principal-component-analysis-python/
+from sklearn.decomposition import PCA
+pca = PCA(n_components = 20)
+pca.fit(X_train, y_train)
 
 
+var=pca.explained_variance_ratio_
+print(var)
+print(pca.components_)
+aaa = pca.components_
+aaa= pd.DataFrame(aaa)
+aaa= aaa.abs()
+a = aaa[0].sort_values(ascending = False)
+
+
+var1=np.cumsum(pca.explained_variance_ratio_)
+print(var1)
+
+k = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+plt.plot(var1)
+plt.xticks(k)
+plt.show()
+
+k = np.arange(1, 20)
 
 
 #
@@ -297,5 +349,4 @@ print(ada_mis)
 
 
 ### Model evaluation
-
 
