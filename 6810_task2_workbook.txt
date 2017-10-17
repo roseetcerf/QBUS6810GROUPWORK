@@ -16,10 +16,14 @@ Part 2: Data understanding (all data)
 	- For Y: 
 		- porpotion of +ve response in training set: 16.582% 
 		- correlation to Y(response).    【corr to Response.csv  & corr to Response(abs).csv】 
+		$我重点写了correlation（abs)最高的五个变量【top5_corr_descrip.csv】的性质
 	- For X:
 		- Descriptive analysis + skew & kurt.  【descriptive for X_train.csv】
+		$ 根据tutorial 10,我加入了correlation(abs)最高的5个变量的histograms 和 univariate logistic regressions【'pictures for top 5' folder】
 
 Part 3: Data preparation (variable selection)
+    -data transformation:
+        $加入了data transformation(standardization)
 	- PCA
 		- 需要9个components，更多的几乎没有再有提高
 	- forward subset method： 有20个features被选中

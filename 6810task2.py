@@ -16,10 +16,12 @@ Created on Sat Oct 14 18:02:10 2017
 import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from sklearn.model_selection import train_test_split
 
-df = pd.read_csv("Clothing_Store.csv") # load CSV file
+df = pd.read_csv("D:\Semester 3\QBUS 6810\Group Assignment\Task 2\QBUS6810GROUPWORK-task2/Clothing_Store.csv") # load CSV file
+
 
 ### Data cleaning ###
 X = df.iloc[:, :-1]
@@ -29,7 +31,7 @@ phone = pd.get_dummies(X['VALPHON'], drop_first=True) # Get dummy
 phone = phone.rename(columns = {'Y':'VALPHON'})
 
 X = X.drop('VALPHON', axis=1)
-X = X.drop('HHKEY', axis=1)
+#X = X.drop('HHKEY', axis=1)
 
 # Cleaned Variables & target
 X = pd.concat([X, phone], axis=1)
@@ -77,6 +79,34 @@ print(descrip.round(3))
 
 descrip.to_csv('descriptive for X_train.csv')
 
+top5_corr=['FRE', 'CLASSES', 'STYLES', 'RESPONDED', 'RESPONSERATE']
+top5_corr_descrip=descrip[['FRE', 'CLASSES', 'STYLES', 'RESPONDED', 'RESPONSERATE']]
+top5_corr_descrip.to_csv("D:\Semester 3\QBUS 6810\Group Assignment\Task 2\QBUS6810GROUPWORK-task2/top5_corr_descrip.csv")
+
+def hist(series):
+    fig,ax=plt.subplots()
+    sns.distplot(series,ax=ax,hist_kws={'alpha':0.9, 'edgecolor':'black','color':sns.color_palette('Blues')[-1]},
+                                        kde_kws={'color':'black','alpha':0.7})
+    return fig, ax
+
+for i in range(5):
+    hist(X_train[top5_corr[i]])
+    sns.despine()
+    plt.show()
+        
+for i in range(5):
+    sns.regplot(X_train[top5_corr[i]], y_train, color=sns.color_palette('Blues')[-1],ci=None, logistic=True, y_jitter=0.05,
+            scatter_kws={'s':25,'color':sns.color_palette('Blues')[-1],'alpha':0.5})                  
+    sns.despine()
+    plt.show()
+    
+    
+#data transformation
+mu=X_train.mean()
+sigma=X_train.std()
+
+X_train=(X_train-mu)/sigma
+X_test=(X_test-mu)/sigma
 
 
 ### Variable selection ### 
@@ -85,6 +115,7 @@ descrip.to_csv('descriptive for X_train.csv')
 # Logistic Regression 
 # http://blog.yhat.com/posts/logistic-regression-and-python.html
 
+    
 import statsmodels.api as sm
 logit = sm.Logit(y_train, sm.add_constant(X_train)).fit()
 logit_sum = logit.summary()
@@ -181,31 +212,34 @@ def importance_foreward(indata = df, yVar = yvar, xVar = xvar, stopn = 4):
 
 
 # PCA
+
 # https://www.analyticsvidhya.com/blog/2016/03/practical-guide-principal-component-analysis-python/
-from sklearn.decomposition import PCA
-pca = PCA(n_components = 20)
-pca.fit(X_train, y_train)
-
-
-var=pca.explained_variance_ratio_
-print(var)
-print(pca.components_)
-aaa = pca.components_
-aaa= pd.DataFrame(aaa)
-aaa= aaa.abs()
-a = aaa[0].sort_values(ascending = False)
-
-
-var1=np.cumsum(pca.explained_variance_ratio_)
-print(var1)
-
-k = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
-plt.plot(var1)
-plt.xticks(k)
-plt.show()
-
-k = np.arange(1, 20)
-
+# =============================================================================
+ from sklearn.decomposition import PCA
+ pca = PCA(n_components = 20)
+ pca.fit(X_train, y_train)
+ 
+ 
+ var=pca.explained_variance_ratio_
+ print(var)
+ print(pca.components_)
+ aaa = pca.components_
+ aaa= pd.DataFrame(aaa)
+ aaa= aaa.abs()
+ a = aaa[0].sort_values(ascending = False)
+ 
+ 
+ var1=np.cumsum(pca.explained_variance_ratio_)
+ print(var1)
+ 
+ k = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+ plt.plot(var1)
+ plt.xticks(k)
+ plt.show()
+# 
+ k = np.arange(1, 20)
+ 
+ =============================================================================
 
 #
 #

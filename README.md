@@ -6,3 +6,4 @@
 ~xy. 10/16: - "Workbook" 更新细节
             - "PCA: 10个components"   
             - “"Variable selection": Decition tree (4_maxdepth), Logistic Regression(15), Forward (20)
+~Smile. 10/17: - "workbook" data understanding 和 data preparation 更新细节
