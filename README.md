@@ -17,3 +17,5 @@
            - [数据]:data transform是放在一开始好还是保留在现在的位置。
            - 然后，还都需要什么数据？对于不同的模型？希望用什么值来进行比较？
            - ppt，tutorial跟那个写作的method上，有什么是特殊要注意的？
+## ~Smile. 10/20
+           - 根据tutorial 10, transformation是在EDA之后，variable selection 之前，应该放在原位置就可以了吧？
