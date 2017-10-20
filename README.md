@@ -24,6 +24,7 @@
            regression splines 用在 feature engineering 的部分，如果有时间有精力的话，可以对所有低correlation（因为correlation描述的是线性关系，所以低correlation说明可能存在非线性关系）的variable（补充：跟小伙伴讨论觉得应该是所有numerical variables）进行测试。找出关系后，按照关系对raw data 进行处理(e.g.比如发现了一个变量中存在qudratic function,那么就将对应的变量的原数据做同样的处理），将全部处理完的新的data再去做variable selection。（不过总体感觉这个步骤好复杂很耗时间，我们可以讨论一下要不要做，做到什么程度。）
            -raw data multicollinearity的问题，我们是否需要最开始做一个所有变量的 correlation matrix, 如果相互之间correlation高的话可能会存在multicollinearity，可以用interaction去解决。（见week3 lecture）
            -[data transformation] week 3 讲了data transformation,举例也是用的direct marketing,但是它的transformation是用取log来完成的。我不确定我们是不是也要取log~
-           -week 3 的 lecture也讲到了categorical variables可以用到哪些图去做feature engineering,感觉我们也可以挑几个
+           -week 3 的 lecture也讲到了categorical variables可以用到哪些图去做feature engineering,感觉我们也可以挑几个。
+           -今天出了通知说最后juypter的文件也需要提交，然后今天出了task2的评分标准。
            
            
