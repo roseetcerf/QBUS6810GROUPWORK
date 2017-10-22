@@ -27,4 +27,11 @@
            -week 3 的 lecture也讲到了categorical variables可以用到哪些图去做feature engineering,感觉我们也可以挑几个。
            -今天出了通知说最后juypter的文件也需要提交，然后今天出了task2的评分标准。
            
-           
+## ~xy. 10/22
+            - 到roc curves了，出了model evaluation 的summary。
+            - 还欠confidence interval
+            - summary中：除去了forward 【predict 出来的不是binary？？】， pca 【不在这里】，adaboost & emsamble 【跑不动，code在】。
+            - summary中：包含的有：logit, logit_l1, tree(max_depths), tree(max_features), knn, lda, qda, qda_reg.
+            - 上传了新的code.
+            
+                  
