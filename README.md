@@ -33,5 +33,6 @@
 - summary中：包含的有：logit, logit_l1, tree(max_depths), tree(max_features), knn, lda, qda, qda_reg.
 - 上传了新的code.
 - workbook跟readme功能互换（worbook为大框架更改，readme为细节更改）
+- 【问题】assignment requiremnts 上的第3点：predictive power(用roc来说)，interpretability（用PCA来说？）。所以是说through different methods?
             
                   
