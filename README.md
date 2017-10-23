@@ -37,5 +37,9 @@
 ## ~xy. 10/23
 - 加了Neural Network, Naive Bayes（Gaussian）. 【图：ROC.pdf】 【csv: Model evaluation_summary】
 - 更新code
-            
+
+## ~Smile. 10/24
+- 加入求personal expected profit 的code部分
+- 在邮政官网找到direct mailing marketing的 postage的成本，比较保守取其中最高的一种类型是$1.550，加上打印成本assume $0.450(估计是彩页，比较偏高），一共$2.
+postage来源：https://auspost.com.au/business/marketing-and-communications/bulk-mailouts/bulk-mail-options/acquisition-mail#tab2
                   
