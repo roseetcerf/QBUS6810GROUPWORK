@@ -22,6 +22,16 @@ from sklearn.model_selection import train_test_split
 
 df = pd.read_csv("Clothing_Store.csv") # load CSV file
 
+### Business understanding ###
+number_of_response=sum(df['RESP'])
+#Cost Benefit table
+net_sales=df['MON']
+gross_margin=df['GMP']
+response=df['RESP']
+A=pd.concat([net_sales,gross_margin,response],axis=1)
+A=A[A["RESP"]>0]
+#Personal annual expected gross profit
+expected_gross_profit=sum(A['MON'])/len(A)*sum(A['GMP'])/len(A)
 
 ### Data cleaning ###
 X = df.iloc[:, :-1]
