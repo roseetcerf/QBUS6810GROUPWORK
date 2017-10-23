@@ -219,6 +219,33 @@ logit_l1_score = pd.DataFrame([logit_l1_mis, logit_l1_se, logit_l1_sensi, logit_
 
 # =============================================================================
 
+# Logistic l2 （Ridge）
+logit_l2 = LogisticRegressionCV(penalty = 'l2', cv=5)
+logit_l2.fit(X_train, y_train)  # fit training set
+
+
+# Predict
+logit_l2_pred = logit_l2.predict(X_test)   # predit on test set
+logit_l2_prob = logit_l2.predict_proba(X_test)
+
+logit_l2_confusion = confusion_matrix(y_test, logit_l2_pred)
+logit_l2_mis = (1- accuracy_score(y_test, logit_l2_pred)).round(3)
+logit_l2_se = np.sqrt(logit_l2_mis*(1- logit_l2_mis)/len(y_test)).round(3)
+logit_l2_sensi = logit_l2_confusion[1,1]/np.sum(logit_l2_confusion[1,:]).round(3)
+logit_l2_speci = logit_l2_confusion[0,0]/np.sum(logit_l2_confusion[0,:]).round(3)
+logit_l2_auc = roc_auc_score(y_test, logit_l2_prob[:,1]).round(3)
+logit_l2_precision = precision_score(y_test, logit_l2_pred).round(3)
+
+columns = ['L2 regularised']
+rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+
+logit_l2_score = pd.DataFrame([logit_l2_mis, logit_l2_se, logit_l2_sensi, logit_l2_speci, logit_l2_auc, logit_l2_precision], columns = columns, index = rows)
+
+
+
+
+# =============================================================================
+
 
 # =============================================================================
 # Decision Tree
@@ -436,7 +463,7 @@ knn_score = pd.DataFrame([knn_mis, knn_se, knn_sensi, knn_speci, knn_auc, knn_pr
 
 
 # =============================================================================
-# Adaboost Classifier [跑不动]
+# Adaboost Classifier 
 from sklearn import ensemble
 
 n_grid = {"n_estimators": np.arange(1, 50, 1)}
@@ -569,42 +596,9 @@ rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 
 qda_reg_score = pd.DataFrame([qda_reg_mis, qda_reg_se, qda_reg_sensi, qda_reg_speci, qda_reg_auc, qda_reg_precision], columns = columns, index = rows)
 
-
-
 # =============================================================================
 
 
-# =============================================================================
-### Emsamble(w/o Dscriminant analysis) [跑不动]
-from sklearn.ensemble import VotingClassifier
-# Voting Classifier
-eclf = VotingClassifier(estimators = [('Logit', logit), ('Logit_L1', logit_l1), ('Tree', tree), ('kNN', knn), ('Adabost', ada)], voting = 'hard')
-
-eclf.fit(X_train, y_train)
-
-#predict
-eclf_pred= eclf.predict(X_test)
-eclf_prob = eclf.predict_proba(X_test)
-
-#print(classification_report(y_test, eclf_pred))
-#print(confusion_matrix(y_test, eclf_pred))
-#eclf_mis = 1- accuracy_score(y_test, eclf_pred)
-#print("Mis_rate_eclf: {0:.3f}".format(eclf_mis))
-
-eclf_confusion = confusion_matrix(y_test, eclf_pred)
-eclf_mis = (1- accuracy_score(y_test, eclf_pred)).round(3)
-eclf_se = np.sqrt(eclf_mis*(1- eclf_mis)/len(y_test)).round(3)
-eclf_sensi = eclf_confusion[1,1]/np.sum(eclf_confusion[1,:]).round(3)
-eclf_speci = eclf_confusion[0,0]/np.sum(eclf_confusion[0,:]).round(3)
-eclf_auc = roc_auc_score(y_test, eclf_prob[:,1]).round(3)
-eclf_precision = precision_score(y_test, eclf_pred).round(3)
-
-columns = ['Emsamble']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
-
-eclf_score = pd.DataFrame([eclf_mis, eclf_se, eclf_sensi, eclf_speci, eclf_auc, eclf_precision], columns = columns, index = rows)
-
-# =============================================================================
 
 # =============================================================================
 # Neural network models（Multi-layer Perceptron）
@@ -634,11 +628,76 @@ nn_score = pd.DataFrame([nn_mis, nn_se, nn_sensi, nn_speci, nn_auc, nn_precision
 
 # =============================================================================
 
+# =============================================================================
+
+#Naive_bayes (Gaussian)
+# from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import GaussianNB
+
+nb = GaussianNB()
+
+nb.fit(X_train, y_train)
+
+#predict
+nb_pred = nb.predict(X_test)
+nb_prob = nb.predict_proba(X_test)
+
+
+nb_confusion = confusion_matrix(y_test, nb_pred)
+nb_mis = (1- accuracy_score(y_test, nb_pred)).round(3)
+nb_se = np.sqrt(nb_mis*(1- nn_mis)/len(y_test)).round(3)
+nb_sensi = nb_confusion[1,1]/np.sum(nb_confusion[1,:]).round(3)
+nb_speci = nb_confusion[0,0]/np.sum(nb_confusion[0,:]).round(3)
+nb_auc = roc_auc_score(y_test, nb_prob[:,1]).round(3)
+nb_precision = precision_score(y_test, nb_pred).round(3)
+
+columns = ['Gaussian Naive Bayes']
+rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+
+nb_score = pd.DataFrame([nb_mis, nb_se, nb_sensi, nb_speci, nb_auc, nb_precision], columns = columns, index = rows)
+
+
+# =============================================================================
+
+
+# =============================================================================
+### Emsamble(w/o Dscriminant analysis) [跑不动]
+from sklearn.ensemble import VotingClassifier
+# Voting Classifier
+eclf = VotingClassifier(estimators = [('Logit', logit), ('Logit_L1', logit_l1), ('Logit_L2', logit_l2), ('Tree_depths', tree1), ('Tree_features', tree2), ('kNN', knn), ('Adabost', ada), ('NN', nn)], voting = 'hard')
+
+eclf.fit(X_train, y_train)
+
+#predict
+eclf_pred= eclf.predict(X_test)
+eclf_prob = eclf.predict_proba(X_test)
+
+#print(classification_report(y_test, eclf_pred))
+#print(confusion_matrix(y_test, eclf_pred))
+#eclf_mis = 1- accuracy_score(y_test, eclf_pred)
+#print("Mis_rate_eclf: {0:.3f}".format(eclf_mis))
+
+eclf_confusion = confusion_matrix(y_test, eclf_pred)
+eclf_mis = (1- accuracy_score(y_test, eclf_pred)).round(3)
+eclf_se = np.sqrt(eclf_mis*(1- eclf_mis)/len(y_test)).round(3)
+eclf_sensi = eclf_confusion[1,1]/np.sum(eclf_confusion[1,:]).round(3)
+eclf_speci = eclf_confusion[0,0]/np.sum(eclf_confusion[0,:]).round(3)
+eclf_auc = roc_auc_score(y_test, eclf_prob[:,1]).round(3)
+eclf_precision = precision_score(y_test, eclf_pred).round(3)
+
+columns = ['Emsamble']
+rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+
+eclf_score = pd.DataFrame([eclf_mis, eclf_se, eclf_sensi, eclf_speci, eclf_auc, eclf_precision], columns = columns, index = rows)
+
+# =============================================================================
+
+
 
 
 # =============================================================================
 ### Model evaluation[没有ada yet]
-summary = pd.concat([logit_score, logit_l1_score, tree1_score, tree2_score, knn_score, nn_score, lda_score, qda_score, qda_reg_score], axis=1)                
+summary = pd.concat([logit_score, logit_l1_score, logit_l2_score, tree1_score, tree2_score, knn_score, ada_score, nn_score, nb_score, lda_score, qda_score, qda_reg_score], axis=1)                
 
 summary.to_csv('Model evaluation_summary.csv')
 
@@ -648,17 +707,18 @@ summary.to_csv('Model evaluation_summary.csv')
 
 ### ROC curves   [ada & knn not included yet]
 # https://xkcd.com/color/rgb/    选颜色
-palette = ['#1F77B4', '#FF7F0E', '#2CA02C', '#DB2728', '#9467BD', '#95A5A6', '#34495E', 'denim blue', 'pale red',]
+%matplotlib inline
+palette = ['#1F77B4', '#FF7F0E', '#2CA02C', '#980002', '#9ffeb0', '#516572', '#4b006e', '#DB2728', '#9467BD', '#95A5A6', '#34495E', '#137e6d']
 
 from sklearn.metrics import roc_curve
 
-labels=['Logistic regression', 'L1 regularised', 'Tree_depths', 'Tree_features', 'Neural network', 'LDA', 'QDA', 'Regularised QDA']
-methods=[logit, logit_l1, tree1, tree2, nn, lda, qda, qda_reg]
+labels=['Logistic regression', 'L1 regularised', 'L2 regularised', 'Tree_depths', 'Tree_features', 'KNN', 'AdaBoost', 'Neural network', 'Gaussian Naive Bayes', 'LDA', 'QDA', 'Regularised QDA']
+methods=[logit, logit_l1, logit_l2, tree1, tree2, knn, ada, nn, nb, lda, qda, qda_reg]
 
 fig, ax= plt.subplots(figsize=(9,6))
 
 for i, method in enumerate(methods):
-    if i < 5:
+    if i < 9:
         y_prob = method.predict_proba(X_test)
     else:
         y_prob = method.predict_proba(X_test_da)
@@ -673,7 +733,7 @@ ax.set_ylabel('Sensitivity')
 ax.set_title('ROC curves', fontsize=14)
 plt.legend(fontsize=13)
 plt.show()
-
+fig.savefig('ROC.pdf')
 
 
 
