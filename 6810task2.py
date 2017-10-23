@@ -593,7 +593,7 @@ eclf_prob = eclf.predict_proba(X_test)
 
 eclf_confusion = confusion_matrix(y_test, eclf_pred)
 eclf_mis = (1- accuracy_score(y_test, eclf_pred)).round(3)
-eclf_se = np.sqrt(eclf_mis*(1- qda_reg_mis)/len(y_test)).round(3)
+eclf_se = np.sqrt(eclf_mis*(1- eclf_mis)/len(y_test)).round(3)
 eclf_sensi = eclf_confusion[1,1]/np.sum(eclf_confusion[1,:]).round(3)
 eclf_speci = eclf_confusion[0,0]/np.sum(eclf_confusion[0,:]).round(3)
 eclf_auc = roc_auc_score(y_test, eclf_prob[:,1]).round(3)
@@ -606,10 +606,39 @@ eclf_score = pd.DataFrame([eclf_mis, eclf_se, eclf_sensi, eclf_speci, eclf_auc, 
 
 # =============================================================================
 
+# =============================================================================
+# Neural network models（Multi-layer Perceptron）
+# http://scikit-learn.org/stable/modules/neural_networks_supervised.html
+from sklearn.neural_network import MLPClassifier
+
+nn = MLPClassifier(activation = 'logistic')
+
+nn.fit(X_train, y_train) 
+
+#predict
+nn_pred = nn.predict(X_test)
+nn_prob = nn.predict_proba(X_test)
+
+nn_confusion = confusion_matrix(y_test, nn_pred)
+nn_mis = (1- accuracy_score(y_test, nn_pred)).round(3)
+nn_se = np.sqrt(nn_mis*(1- nn_mis)/len(y_test)).round(3)
+nn_sensi = nn_confusion[1,1]/np.sum(nn_confusion[1,:]).round(3)
+nn_speci = nn_confusion[0,0]/np.sum(nn_confusion[0,:]).round(3)
+nn_auc = roc_auc_score(y_test, nn_prob[:,1]).round(3)
+nn_precision = precision_score(y_test, nn_pred).round(3)
+
+columns = ['Emsamble']
+rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+
+nn_score = pd.DataFrame([nn_mis, nn_se, nn_sensi, nn_speci, nn_auc, nn_precision], columns = columns, index = rows)
+
+# =============================================================================
 
 
-### Model evaluation
-summary = pd.concat([logit_score, logit_l1_score, tree1_score, tree2_score, knn_score, lda_score, qda_score, qda_reg_score], axis=1)                
+
+# =============================================================================
+### Model evaluation[没有ada yet]
+summary = pd.concat([logit_score, logit_l1_score, tree1_score, tree2_score, knn_score, nn_score, lda_score, qda_score, qda_reg_score], axis=1)                
 
 summary.to_csv('Model evaluation_summary.csv')
 
@@ -617,14 +646,14 @@ summary.to_csv('Model evaluation_summary.csv')
 ### Confidence Interval!!!
 
 
-### ROC curves
-
-palette = ['#1F77B4', '#FF7F0E', '#2CA02C', '#DB2728', '#9467BD', '#95A5A6', '#34495E']
+### ROC curves   [ada & knn not included yet]
+# https://xkcd.com/color/rgb/    选颜色
+palette = ['#1F77B4', '#FF7F0E', '#2CA02C', '#DB2728', '#9467BD', '#95A5A6', '#34495E', 'denim blue', 'pale red',]
 
 from sklearn.metrics import roc_curve
 
-labels=['Logistic regression', 'L1 regularised', 'Tree_depths', 'Tree_features', 'knn', 'LDA', 'QDA', 'Regularised QDA']
-methods=[logit, logit_l1, tree1, tree2, knn, lda, qda, qda_reg]
+labels=['Logistic regression', 'L1 regularised', 'Tree_depths', 'Tree_features', 'Neural network', 'LDA', 'QDA', 'Regularised QDA']
+methods=[logit, logit_l1, tree1, tree2, nn, lda, qda, qda_reg]
 
 fig, ax= plt.subplots(figsize=(9,6))
 
