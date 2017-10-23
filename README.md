@@ -35,7 +35,7 @@
 - 【问题】assignment requiremnts 上的第3点：predictive power(用roc来说)，interpretability（用PCA来说？）。所以是说through different methods?
 
 ## ~xy. 10/23
-- 加了Neural Network, Naive Bayes（Gaussian）. 【图：ROC.pdf】
+- 加了Neural Network, Naive Bayes（Gaussian）. 【图：ROC.pdf】 【csv: Model evaluation_summary】
 - 更新code
             
                   
