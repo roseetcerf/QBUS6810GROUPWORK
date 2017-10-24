@@ -42,4 +42,9 @@
 - 加入求personal expected profit 的code部分
 - 在邮政官网找到direct mailing marketing的 postage的成本，比较保守取其中最高的一种类型是$1.550，加上打印成本assume $0.450(估计是彩页，比较偏高），一共$2.
 postage来源：https://auspost.com.au/business/marketing-and-communications/bulk-mailouts/bulk-mail-options/acquisition-mail#tab2
+
+-更新data understanding feature engineering categorical variablles 部分 code
+-Report 更新至Data understanding 结束。
+-【瓶颈】是否或者怎样对data做normaliztion的处理，目前知道的，至少PCA和Gussian Descriptive Analysis 需要normalization.(嘉庆的思路：只处理numerical variables, 处理完后和 categorical variables combine 再做接下来的分析。
+
                   
