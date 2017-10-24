@@ -88,6 +88,8 @@ corr_y.to_csv('corr to Response(absolute).csv')
 
 
 # For X：
+# Feature Engineering
+#numerical variables
 # Descriptive analysis + skew & kurt
 descrip = X_train.describe()
 descrip.loc['skew', :] = X_train.skew()
@@ -117,7 +119,22 @@ for i in range(5):
     sns.despine()    
     plt.show()
 
+#categorical variables
+    
+table_VALPHON=pd.crosstab(y_train,X_train['VALPHON'])
+table_VALPHON=(table_VALPHON/table_VALPHON.sum()).round(3)
+print(table_VALPHON)
+table_VALPHON.to_csv('table_VALPHON.csv')
 
+table_CC_CARD=pd.crosstab(y_train,X_train['CC_CARD'])
+table_CC_CARD=(table_CC_CARD/table_CC_CARD.sum()).round(3)
+print(table_CC_CARD)
+table_CC_CARD.to_csv('table_CC_CARD.csv')
+
+table_WEB=pd.crosstab(y_train,X_train['WEB'])
+table_WEB=(table_WEB/table_WEB.sum()).round(3)
+print(table_WEB)
+table_WEB.to_csv('table_WEB.csv')
 
     
 #data transformation
