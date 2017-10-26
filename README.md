@@ -47,4 +47,5 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 - Report 更新至Data understanding 结束。
 - 【瓶颈】是否或者怎样对data做normaliztion的处理，目前知道的，至少PCA和Gussian Descriptive Analysis 需要normalization.(嘉庆的思路：只处理numerical variables, 处理完后和 categorical variables combine 再做接下来的分析。
 
-                  
+## ~xy. 10/26
+- normalize 了。
