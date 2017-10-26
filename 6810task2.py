@@ -137,16 +137,47 @@ print(table_WEB)
 table_WEB.to_csv('table_WEB.csv')
 
     
-#data transformation
+#data transformation [Standerdization]
 mu=X_train.mean()
 sigma=X_train.std()
 
 X_train=(X_train-mu)/sigma
 X_test=(X_test-mu)/sigma
 
+# [Normalization]
+#https://wenchao.ren/archives/59
+from sklearn import preprocessing
+X_train_num = X_train.drop(['CC_CARD','VALPHON','WEB','CLUSTYPE'], axis=1)
+X_test_num = X_test.drop(['CC_CARD','VALPHON','WEB','CLUSTYPE'], axis=1)
+
+X_train_norm = preprocessing.normalize(X_train_num)
+X_train_norm = pd.DataFrame(X_train_norm, columns = X_train_num.columns, index = X_train_num.index)
+
+X_test_norm = preprocessing.normalize(X_test_num)
+X_test_norm = pd.DataFrame(X_test_norm, columns = X_test_num.columns, index = X_test_num.index)
+
+X_train_cal = X_train[['CC_CARD', 'VALPHON', 'WEB', 'CLUSTYPE']]
+X_test_cal = X_test[['CC_CARD', 'VALPHON', 'WEB', 'CLUSTYPE']]
+
+
+X_train = pd.concat([X_train_norm, X_train_cal], axis=1)
+X_test = pd.concat([X_test_norm, X_test_cal], axis = 1)
+
 X_train.to_csv('Norm X_train.csv')
 X_test.to_csv('Norm X_test.csv')
 
+#
+## [One hot encoding] [不要了]
+##http://blog.csdn.net/pipisorry/article/details/61193868
+##X_train_cal = X_train[['CC_CARD', 'VALPHON', 'WEB', 'CLUSTYPE']]
+##X_test_cal = X_test[['CC_CARD', 'VALPHON', 'WEB', 'CLUSTYPE']]
+##
+##encoder = preprocessing.OneHotEncoder()
+#X_train_enc = encoder.fit(X_train_cal)
+#X_train_enc = pd.get_dummies(X_train_enc)
+#X_train_enc = encoder.transform(X_train_cal).toarray()
+#
+#X_train_enc = pd.DataFrame(X_train_enc, columns = X_train_cal.columns)
 
 
 
@@ -155,6 +186,10 @@ X_test.to_csv('Norm X_test.csv')
 
 # =============================================================================
 # Logistic Regression 
+
+#http://blog.yhat.com/posts/logistic-regression-and-python.html
+
+
 # http://blog.yhat.com/posts/logistic-regression-and-python.html    
 import statsmodels.api as sm
 logit = sm.Logit(y_train, sm.add_constant(X_train)).fit()
@@ -174,6 +209,7 @@ logit_params_abs.to_csv('logit_coef_asb.csv')
 from sklearn.linear_model import LogisticRegression
 logit = LogisticRegression()
 logit.fit(X_train, y_train)
+
 
 #predict
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_auc_score, precision_score
@@ -195,10 +231,25 @@ logit_speci = logit_confusion[0,0]/np.sum(logit_confusion[0,:]).round(3)
 logit_auc = roc_auc_score(y_test, logit_prob[:,1]).round(3)
 logit_precision = precision_score(y_test, logit_pred).round(3)
 
+
+# Confidence intervals.
+#https://machinelearningmastery.com/calculate-bootstrap-confidence-intervals-machine-learning-results-python/
+logit_accuracy = accuracy_score(y_test, logit_pred)
+alpha = 0.95
+p = ((1.0 - alpha)/2.0) * 100
+lower = max(0.0, np.percentile(logit_accuracy, p))
+q = ( alpha + ((1.0 - alpha)/2.0)) * 100
+upper = min(1.0, np.percentile(logit_accuracy, q))
+print('%.1f confidence interval %.1f%% and %.1f%%' % (alpha*100, lower*100, upper*100))
+
+
+
 columns = ['Logistic']
 rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 
 logit_score = pd.DataFrame([logit_mis, logit_se, logit_sensi, logit_speci, logit_auc, logit_precision], columns = columns, index = rows)
+
+
 
 
 # =============================================================================
@@ -244,6 +295,20 @@ rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 
 logit_l1_score = pd.DataFrame([logit_l1_mis, logit_l1_se, logit_l1_sensi, logit_l1_speci, logit_l1_auc, logit_l1_precision], columns = columns, index = rows)
 
+
+# Confidence intervals.
+logit_l1_accuracy = accuracy_score(y_test, logit_l1_pred)
+alpha = 0.95
+p = ((1.0 - alpha)/2.0) * 100
+lower = max(0.0, np.percentile(logit_l1_accuracy, p))
+q = (alpha + ((1.0 - alpha)/2.0)) * 100
+upper = min(1.0, np.percentile(logit_l1_accuracy, q))
+print('%.1f confidence interval %.1f%% and %.1f%%' % (alpha*100, lower*100, upper*100))
+
+
+
+
+
 # =============================================================================
 
 # Logistic l2 （Ridge）
@@ -267,6 +332,15 @@ columns = ['L2 regularised']
 rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 
 logit_l2_score = pd.DataFrame([logit_l2_mis, logit_l2_se, logit_l2_sensi, logit_l2_speci, logit_l2_auc, logit_l2_precision], columns = columns, index = rows)
+
+# Confidence intervals.
+logit_accuracy = accuracy_score(y_test, logit_l2_pred)
+alpha = 0.95
+p = ((1.0 - alpha)/2.0) * 100
+lower = max(0.0, np.percentile(logit_accuracy, p))
+q = (alpha + ((1.0 - alpha)/2.0)) * 100
+upper = min(1.0, np.percentile(logit_accuracy, q))
+print('%.1f confidence interval %.1f%% and %.1f%%' % (alpha*100, lower*100, upper*100))
 
 
 
@@ -369,8 +443,6 @@ tree2_score = pd.DataFrame([tree2_mis, tree2_se, tree2_sensi, tree2_speci, tree2
 
 
 # =============================================================================
-
-
 
 
 
@@ -526,8 +598,8 @@ ada_score = pd.DataFrame([ada_mis, ada_se, ada_sensi, ada_speci, ada_auc, ada_pr
 
 # =============================================================================
 ### ~N  Dscriminant analysis
-X_train_da = X_train.drop(['CC_CARD','VALPHON','WEB'], axis=1)
-X_test_da = X_test.drop(['CC_CARD','VALPHON','WEB'], axis=1)
+X_train_da = X_train.drop(['CC_CARD','VALPHON','WEB', 'CLUSTYPE'], axis=1)
+X_test_da = X_test.drop(['CC_CARD','VALPHON','WEB', 'CLUSTYPE'], axis=1)
 
 # LDA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -730,6 +802,7 @@ summary.to_csv('Model evaluation_summary.csv')
 
 
 ### Confidence Interval!!!
+
 
 
 ### ROC curves   [ada & knn not included yet]
