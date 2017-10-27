@@ -207,7 +207,7 @@ logit_params_abs.to_csv('logit_coef_asb.csv')
 
 # Logistic regression
 from sklearn.linear_model import LogisticRegression
-logit = LogisticRegression()
+logit = LogisticRegression(class_weight=balanced)
 logit.fit(X_train, y_train)
 
 
@@ -258,7 +258,7 @@ logit_score = pd.DataFrame([logit_mis, logit_se, logit_sensi, logit_speci, logit
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 #For small datasets, ‘liblinear’ is a good choice. 'l1' =absolution loss function
 #http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegressionCV.html
-logit_l1 = LogisticRegressionCV(penalty = 'l1', solver = 'liblinear')
+logit_l1 = LogisticRegressionCV(penalty = 'l1', solver = 'liblinear', class_weight=balanced)
 logit_l1.fit(X_train, y_train)  # fit training set
 
 
@@ -312,7 +312,7 @@ print('%.1f confidence interval %.1f%% and %.1f%%' % (alpha*100, lower*100, uppe
 # =============================================================================
 
 # Logistic l2 （Ridge）
-logit_l2 = LogisticRegressionCV(penalty = 'l2', cv=5)
+logit_l2 = LogisticRegressionCV(penalty = 'l2', class_weight=balanced)
 logit_l2.fit(X_train, y_train)  # fit training set
 
 
@@ -525,7 +525,7 @@ tree2_score = pd.DataFrame([tree2_mis, tree2_se, tree2_sensi, tree2_speci, tree2
 
  
 # =============================================================================
-# Knn
+# Knn     [重新fit一下，用来改balance  -- weights=’distance’]
 from sklearn.model_selection import GridSearchCV
 from sklearn import neighbors
 
@@ -566,7 +566,7 @@ knn_score = pd.DataFrame([knn_mis, knn_se, knn_sensi, knn_speci, knn_auc, knn_pr
 from sklearn import ensemble
 
 n_grid = {"n_estimators": np.arange(1, 50, 1)}
-ada = GridSearchCV(ensemble.AdaBoostClassifier(algorithm='SAMME'), n_grid, cv = 5)
+ada = GridSearchCV(ensemble.AdaBoostClassifier(algorithm='SAMME.R'), n_grid, cv = 5)
 ada.fit(X_train, y_train)
 ada_cv = ada.best_estimator_
 print(ada_cv)
