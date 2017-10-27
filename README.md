@@ -51,5 +51,8 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 - normalize 了。
 
 ## ~xy. 10/27
--加了weight (weight_Class = 'balanced')在logistic跟tree里，KNN需要再check一下。DA们和naive bayes不能设置。
+-[code]加了weight (weight_Class = 'balanced')在logistic跟tree里，KNN需要再check一下。DA们和naive bayes不能设置。
 " The “balanced” mode uses the values of y to automatically adjust weights inversely proportional to class frequencies in the input data as n_samples / (n_classes * np.bincount(y))."
+- [code] tree 加了min_samples_leaf
+- add some references on references note.
+- might need to use boxplot to identify the outlier. 
