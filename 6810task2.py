@@ -356,16 +356,15 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier 
 
 
-# base on max_depth
-# Grid Search
+# base on max_depth & min_samples_leaf
 pipeline = Pipeline([('clf',DecisionTreeClassifier(criterion='entropy'))])
-parameters = {'clf__max_depth': np.arange(2, 50, 1)}
+parameters = {'clf__max_depth': np.arange(2, 50, 1)， 'clf__min_samples_leaf': [1,5,10,20]}
 grid_search = GridSearchCV(pipeline, parameters, cv=5)
 grid_search.fit(X_train, y_train)
-print("Best max_depths: {0}".format(grid_search.best_params_))
+print(grid_search.best_params_)
 
 # fit model
-tree1 = tree.DecisionTreeClassifier(criterion = 'entropy', max_depth = 4, class_weight = 'balanced', random_state = 0)
+tree1 = tree.DecisionTreeClassifier(criterion = 'entropy', max_depth = 4, min_samples_leaf = ?, class_weight = 'balanced', random_state = 0)
 tree1.fit(X_train, y_train)
 
 # variable selected
