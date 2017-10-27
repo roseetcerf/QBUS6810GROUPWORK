@@ -400,7 +400,7 @@ tree1_score = pd.DataFrame([tree1_mis, tree1_se, tree1_sensi, tree1_speci, tree1
 
 # =============================================================================
 
-# based on max_features
+# based on max_features   [不要了，改成使用RF来看features]
 # Grid Search
 pipeline = Pipeline([('clf',DecisionTreeClassifier(criterion='entropy'))])
 parameters = {'clf__max_features': np.arange(2, 50, 1)}
@@ -440,7 +440,44 @@ rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 
 tree2_score = pd.DataFrame([tree2_mis, tree2_se, tree2_sensi, tree2_speci, tree2_auc, tree2_precision], columns = columns, index = rows)
 
+# =============================================================================
+ # Random Foreast [bagging]
+ 
+# Gridsearch
+model = RandomForestClassifier(n_estimators=1000)
+tuning_parameters = [{'min_samples_leaf': [1,5,10],'max_features': list(np.arange(2,len(predictors))),}]
 
+# the n_jobs option enables parallel processing
+rf = GridSearchCV(model, tuning_parameters, cv=10, return_train_score=False, n_jobs=4)
+rf.fit(X_train_tree, y_train)
+print(rf.best_params_)
+
+# fit model
+rf = RandomForestRegressor(n_estimators=5000, max_features = rf.best_params_['max_features'], 
+                           min_samples_leaf= rf.best_params_['min_samples_leaf'])
+rf.fit(X_train_tree, y_train)
+
+# Predict
+rf_pred = rf.predict(X_test)
+rf_prob = rf.predict_proba(X_test)
+
+rf_confusion = confusion_matrix(y_test, rf_pred)
+rf_mis = (1- accuracy_score(y_test, rf_pred)).round(3)
+rf_se = np.sqrt(rf_mis*(1- rf_mis)/len(y_test)).round(3)
+rf_sensi = rf_confusion[1,1]/np.sum(rf_confusion[1,:]).round(3)
+rf_speci = rf_confusion[0,0]/np.sum(rf_confusion[0,:]).round(3)
+rf_auc = roc_auc_score(y_test, rf_prob[:,1]).round(3)
+rf_precision = precision_score(y_test, rf_pred).round(3)
+
+columns = ['Decision Tree_features']
+rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+
+rf_score = pd.DataFrame([rf_mis, rf_se, rf_sensi, rf_speci, rf_auc, rf_precision], columns = columns, index = rows)
+
+# feature_importance
+from statlearning import plot_feature_importance
+plot_feature_importance(rf, predictors)
+plt.show()
 # =============================================================================
 
 
