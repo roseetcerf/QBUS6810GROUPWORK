@@ -53,6 +53,7 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 ## ~xy. 10/27
 -[code]加了weight (weight_Class = 'balanced')在logistic跟tree里，KNN需要再check一下。DA们和naive bayes不能设置。
 " The “balanced” mode uses the values of y to automatically adjust weights inversely proportional to class frequencies in the input data as n_samples / (n_classes * np.bincount(y))."
-- [code] tree 加了min_samples_leaf
+- [code] tree_depth 加了min_samples_leaf (还没跑~要跑一次看看depth 跟 leaf的数是多少，再用到fit里面). 可以再用一下gini看是不是比现在用entropy好。
+- [code] 加个random foreast在里面比较好。然后用一下plot_feature_importance   【as bagging~】
 - add some references on references note.
 - might need to use boxplot to identify the outlier. 
