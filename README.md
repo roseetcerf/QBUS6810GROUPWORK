@@ -54,6 +54,10 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 -[code]加了weight (weight_Class = 'balanced')在logistic跟tree里，KNN需要再check一下。DA们和naive bayes不能设置。
 " The “balanced” mode uses the values of y to automatically adjust weights inversely proportional to class frequencies in the input data as n_samples / (n_classes * np.bincount(y))."
 - [code] tree_depth 加了min_samples_leaf (还没跑~要跑一次看看depth 跟 leaf的数是多少，再用到fit里面). 可以再用一下gini看是不是比现在用entropy好。
-- [code] 加个random foreast在里面比较好。然后用一下plot_feature_importance   【as bagging~】
+- [code] 加个random foreast, 还没在evaluation那改，（没有跑，需要跑一下，大概比较久）【as bagging】
+“After Importance: Let’s use the top 5 variables for creating a model. Also, we will modify the parameters of random forest model a little bit:”
+- 【待处理】[code] 把emsamble改一改，用少一点的model来 【as boosting】 (还没改)
 - add some references on references note.
 - might need to use boxplot to identify the outlier. 
+-【待处理】scaling是否要分别对待？貌似没必要，毕竟scale后，没影响的也不会怎样。 distance model：KNN， LDA,
+《https://www.analyticsvidhya.com/blog/2016/07/practical-guide-data-preprocessing-python-scikit-learn/》
