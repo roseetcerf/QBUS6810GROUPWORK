@@ -61,3 +61,6 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 - might need to use boxplot to identify the outlier. 
 -【待处理】scaling是否要分别对待？貌似没必要，毕竟scale后，没影响的也不会怎样。 distance model：KNN， LDA,
 《https://www.analyticsvidhya.com/blog/2016/07/practical-guide-data-preprocessing-python-scikit-learn/》
+
+## ~xy. 10/28
+-【待处理】 emsemble的时候，要选diversify的模型， “a random forest, a KNN, and a Naive Bayes”
