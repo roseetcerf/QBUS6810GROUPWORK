@@ -312,25 +312,25 @@ for i in range(len(corr_matrix.columns)):
 print(corr_col_1)
 print(corr_col_0)
 
-corr_high = corr_matrix[['LTFREDAY', 'MAILED', 'CLASSES', 'STYLES', 'RESPONSERATE', 'HI']]
-
-corr_matrix_abs = corr_matrix.abs()
-
-
-a = ['LTFREDAY', 'MAILED', 'CLASSES', 'STYLES', 'RESPONSERATE']
-
-aa = corr_matrix.drop(corr_matrix.rows)
-
-corr_high.values <= 0.8
-pd.corr_high(data <0.8)
-
-
-a= corr_matrix.columns
-
-aaa= corr_matrix_abs.clip_lower(0.79)
-
-[set成str，然后删掉。]
-
+#corr_high = corr_matrix[['LTFREDAY', 'MAILED', 'CLASSES', 'STYLES', 'RESPONSERATE', 'HI']]
+#
+#corr_matrix_abs = corr_matrix.abs()
+#
+#
+#a = ['LTFREDAY', 'MAILED', 'CLASSES', 'STYLES', 'RESPONSERATE']
+#
+#aa = corr_matrix.drop(corr_matrix.rows)
+#
+#corr_high.values <= 0.8
+#pd.corr_high(data <0.8)
+#
+#
+#a= corr_matrix.columns
+#
+#aaa= corr_matrix_abs.clip_lower(0.79)
+#
+#[set成str，然后删掉。]
+#
 
 # scatter plot -example
 plt.scatter(X['MAILED'], X['PROMOS'])
