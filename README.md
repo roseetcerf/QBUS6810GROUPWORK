@@ -64,3 +64,8 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 
 ## ~xy. 10/28
 -【待处理】 emsemble的时候，要选diversify的模型， “a random forest, a KNN, and a Naive Bayes”
+
+## ~xy. 10/29
+- 整套的EDA都出出来了，有部分地方需要一起讨论【尤其是对flag的那三个variable】，每一块用什么【sample】也可以讨论一下。
+- 上传了code【python & jupyter】，pdf，图【待处理】（有的图没有lable，save清楚），别人组的code
+- 【待处理】跑模型 P25起，解决ci
