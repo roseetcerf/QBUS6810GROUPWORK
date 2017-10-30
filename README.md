@@ -71,6 +71,6 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 - 【待处理】跑模型 P25起，解决ci
 
 ## ~xy.10.30
-- ci也处理完了，只剩下模型整合了。
+- ci也处理完了，只剩下模型整合了。 关于ci的解释，可参考p44~~ 
 - 【待处理】：模型整合，优化图片，出最优模型features，完善jupyter。 
 - 【大头全部结束啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦！！！！！！】
