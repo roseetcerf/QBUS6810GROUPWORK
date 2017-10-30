@@ -259,87 +259,32 @@ plt.title("Norm uniformity w/ differnt response")
 plt.savefig('Norm uniformity with differnt response.pdf')
 
 
-# numerical problem [需要讨论一下，用什么办法处理flag，没太看明白web是怎么进行的逻辑， 但是结果说，反正都是minor的影响]
-# Flag variables effect on spent
-spent = df[['AMSPEND', 'PSSPEND','CCSPEND', 'AXSPEND','OMONSPEND', 'TMONSPEND','SMONSPEND','PREVPD']]
-flags = X[['CC_CARD', 'VALPHON', 'WEB']]
-spent_flags=pd.concat([spent, flags, y], axis=1)
-
-spent_name = ['AMSPEND', 'PSSPEND','CCSPEND', 'AXSPEND','OMONSPEND', 'TMONSPEND','SMONSPEND','PREVPD']
-flags_name = ['CC_CARD', 'VALPHON', 'WEB']
-# prop w/ card + respond
-prop_card = []
-prop_phone = []
-prop_web = []
-for i in spent_name:
-    card = spent_flags[(spent_flags[i] != 0) & (spent_flags['RESP'] !=0) & (spent_flags['CC_CARD'] !=0)]
-    card = card[i].count()/len(y) *100
-    phone = spent_flags[(spent_flags[i] != 0) & (spent_flags['RESP'] !=0) & (spent_flags['VALPHON'] !=0)]
-    phone = phone[i].count()/len(y) *100
-    web = spent_flags[(spent_flags[i] != 0) & (spent_flags['RESP'] !=0) & (spent_flags['WEB'] !=0)]
-    web = web[i].count()/len(y) *100  
-    prop_card.append(card)
-    prop_phone.append(phone)
-    prop_web.append(web)
-
-prop_card = pd.DataFrame(np.array(prop_card), index = spent_name).rename(columns ={0: 'CC_CARD'})
-prop_phone = pd.DataFrame(np.array(prop_phone), index = spent_name).rename(columns ={0: 'VALPHON'})
-prop_web = pd.DataFrame(np.array(prop_web), index = spent_name).rename(columns ={0: 'WEB'})
-
-prop_flags = pd.concat([prop_card, prop_phone, prop_web], axis=1)
-
-#.sort_values(0, ascending=False)
-
-# other way
-flags.corrwith(y)
-
-
 ### correlation b/w variables -multicollinearity
 corr_matrix = X.corr()
+corr_index = corr_matrix.index
 
-# getting the name of column
-corr_col_0 = set()
-corr_col_1 = set()
+# high corr 
 for i in range(len(corr_matrix.columns)):
     for j in range(i):
         if corr_matrix.iloc[i, j] >= 0.8:
-            colname_1 = corr_matrix.columns[i] 
-            corr_col_1.add(colname_1)
+            if corr_index[i] != corr_index[j]:
+                print('high corr exist(+ve): ' +corr_index[i]+ ',' +corr_index[j])
+                print(corr_matrix.iloc[i, j].round(2))
         if corr_matrix.iloc[i, j] <= -0.8:  
-            colname_0 = corr_matrix.columns[i]            
-            corr_col_0.add(colname_0)
-                 
-print(corr_col_1)
-print(corr_col_0)
+            if corr_index[i] != corr_index[j]:
+                print('high corr exist(-ve): ' +corr_index[i]+ ',' +corr_index[j])
+                print(corr_matrix.iloc[i, j].round(2))
 
-#corr_high = corr_matrix[['LTFREDAY', 'MAILED', 'CLASSES', 'STYLES', 'RESPONSERATE', 'HI']]
-#
-#corr_matrix_abs = corr_matrix.abs()
-#
-#
-#a = ['LTFREDAY', 'MAILED', 'CLASSES', 'STYLES', 'RESPONSERATE']
-#
-#aa = corr_matrix.drop(corr_matrix.rows)
-#
-#corr_high.values <= 0.8
-#pd.corr_high(data <0.8)
-#
-#
-#a= corr_matrix.columns
-#
-#aaa= corr_matrix_abs.clip_lower(0.79)
-#
-#[set成str，然后删掉。]
-#
 
 # scatter plot -example
+fig = plt.figure()
 plt.scatter(X['MAILED'], X['PROMOS'])
 plt.xlabel("MAILED")
 plt.ylabel("PROMOS")
 plt.title("MAILED vs. PROMOS")
 plt.savefig("MAILED vs PROMOS.pdf")
  
-
+fig = plt.figure()
 plt.scatter(X['CLASSES'], X['HI'])
 plt.xlabel("CLASSES")
 plt.ylabel("Uniformoity")
@@ -348,7 +293,7 @@ plt.savefig("CLASSES vs. UNIFORMROITY.pdf")
 
 
 # Jacket on flags varaibles & response [sample]
-jacket_flags = pd.concat([jacket, flags], axis =1)
+jacket_flags = pd.concat([jacket, X_cal], axis =1)
 
 # prop w/ card + respond
 cardj = jacket_flags[(jacket_flags['PJACKETS'] != 0) & (jacket_flags['RESP'] !=0) & (jacket_flags['CC_CARD'] !=0)]
@@ -363,3 +308,145 @@ webj = jacket_flags[(jacket_flags['PJACKETS'] != 0) & (jacket_flags['RESP'] !=0)
 webj_prob = webj['PJACKETS'].count()/len(y) *100
 print("+ve response on Web for jacket buyer: {0:.2f}%".format(webj_prob))                    
  
+
+## derive other flag variables
+
+# variables contain categorical meaning
+types = df[['PSWEATERS','PKNIT_TOPS','PKNIT_DRES','PBLOUSES','PJACKETS','PCAR_PNTS','PCAS_PNTS','PSHIRTS','PDRESSES','PSUITS','POUTERWEAR','PJEWELRY','PFASHION','PLEGWEAR','PCOLLSPND']]
+spent = df[['AMSPEND','PSSPEND','CCSPEND','AXSPEND','OMONSPEND','TMONSPEND','SMONSPEND','PREVPD']]
+others = df[['RESPONSERATE','PERCRET']]
+
+# binary those variables as 0 is no response, 1 is response
+types= types*999999
+types = types.clip_upper(1)
+
+spent = spent*999999
+spent = spent.clip_upper(1)
+
+others = others*999999
+others = others.clip_upper(1)
+
+# merge new flag variables together.
+flags = pd.concat([types, spent, others], axis=1)
+flags.columns = ['Flag_'] + flags.columns 
+
+# merge with X
+X = pd.concat([X, flags], axis=1)
+
+
+
+
+##### Modeling & Evaluation
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_auc_score, precision_score
+
+
+# Split dataset 
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size = 0.8, random_state = 460475789)
+
+
+# Handle imbalanced dataset - on train data
+from sklearn.utils import resample
+df1 = pd.concat([X_train, y_train], axis=1)
+
+df1_majo = df1[df1['RESP']==0]
+df1_mino = df1[df1['RESP']==1]
+
+# type1: minority upsample
+df1_mino_upsampled = resample(df1_mino, replace=True, n_samples=(len(df1_majo)))
+
+df1_upsampled = pd.concat([df1_majo, df1_mino_upsampled])
+
+df1_upsampled['RESP'].value_counts()
+X_train1 = df1_upsampled.iloc[:, :-1]
+y_train1 = df1_upsampled.iloc[:,-1]
+
+# type2: majority downsample
+df1_majo_downsampled = resample(df1_majo, replace=False, n_samples=(len(df1_mino)))
+
+df1_downsampled = pd.concat([df1_mino, df1_majo_downsampled])
+X_train2 = df1_downsampled.iloc[:, :-1]
+y_train2 = df1_downsampled.iloc[:,-1]
+
+# after check with LogisticRegression L1 & L2, type1 works better, and L2 is same as incite funtion 'class_weight'
+# Therefore, Type1 data, will be used on following Modeling, but not evalution(which based on test data).
+X_train = X_train1
+y_train = y_train1
+
+
+## baseline performance
+num_response0 = y_test[y_test ==0].count()
+num_response1 = y_test[y_test ==1].count()
+print("testset clients num: {0}".format(y_test.count()))
+print("testset +ve response: {0}".format(num_response1))
+print("testset -ve response: {0}".format(num_response0))
+
+##### 然后等一下再弄那个表格的后半部Table7.10
+
+# =============================================================================
+### Model1: Naive bayes 
+from sklearn.naive_bayes import GaussianNB, BernoulliNB
+X_train_num = X_train.iloc[:, :45]
+X_train_cat = X_train.iloc[:, 45:]
+
+X_test_num = X_test.iloc[:, :45]
+X_test_cat = X_test.iloc[:, 45:]
+
+# combine GNB & BNB.
+gnb = GaussianNB().fit(X_train_num, np.ravel(y_train))
+gnb_prob_train = gnb.predict_proba(X_train_num)
+gnb_prob_test = gnb.predict_proba(X_test_num)
+
+bnb = BernoulliNB().fit(X_train_cat, np.ravel(y_train))
+bnb_prob_train = bnb.predict_proba(X_train_cat)
+bnb_prob_test = bnb.predict_proba(X_test_cat)
+
+nb_train = np.hstack((gnb_prob_train, bnb_prob_train))
+nb_test = np.hstack((gnb_prob_test, bnb_prob_test))
+
+# combined NB model fit
+nb = GaussianNB().fit(nb_train, np.ravel(y_train))
+
+# predict
+nb_pred = nb.predict(nb_test)
+nb_prob = nb.predict_proba(nb_test)
+
+nb_confusion = confusion_matrix(y_test, nb_pred)
+nb_mis = (1- accuracy_score(y_test, nb_pred)).round(3)
+nb_se = np.sqrt(nb_mis*(1- nb_mis)/len(y_test)).round(3)
+nb_sensi = nb_confusion[1,1]/np.sum(nb_confusion[1,:]).round(3)
+nb_speci = nb_confusion[0,0]/np.sum(nb_confusion[0,:]).round(3)
+nb_auc = roc_auc_score(y_test, nb_prob[:,1]).round(3)
+nb_precision = precision_score(y_test, nb_pred).round(3)
+
+columns = ['Combined Naive Bayes']
+rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+
+nb_score = pd.DataFrame([nb_mis, nb_se, nb_sensi, nb_speci, nb_auc, nb_precision], columns = columns, index = rows)
+print(nb_score)
+
+
+# Confidence interval
+n_iterations = 1000
+n_size = len(y_train)
+train = nb_train
+test = nb_test
+
+accy = list()
+for i in range(n_iterations):
+    train = resample(train, n_samples=n_size)
+    nb = GaussianNB().fit(train, np.ravel(y_train))
+    y_pred = nb.predict(test)
+    score = accuracy_score(y_test, y_pred)
+    accy.append(score)
+
+alpha = 0.95
+p = ((1-alpha)/2) * 100
+ci_low = np.percentile(accy, p)
+q = (1-((1-alpha)/2)) * 100
+ci_high = np.percentile(accy, q)
+
+print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+
+# =============================================================================
+
