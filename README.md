@@ -69,3 +69,8 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 - 整套的EDA都出出来了，有部分地方需要一起讨论【尤其是对flag的那三个variable】，每一块用什么【sample】也可以讨论一下。
 - 上传了code【python & jupyter】，pdf，图【待处理】（有的图没有lable，save清楚），别人组的code
 - 【待处理】跑模型 P25起，解决ci
+
+## ~xy.10.30
+- ci也处理完了，只剩下模型整合了。
+- 【待处理】：模型整合，优化图片，出最优模型features，完善jupyter。 
+- 【大头全部结束啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦！！！！！！】
