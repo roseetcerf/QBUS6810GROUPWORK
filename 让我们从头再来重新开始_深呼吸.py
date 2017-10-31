@@ -838,10 +838,10 @@ print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100,
 
 
 ## =============================================================================
-### Emsamble(w/o Dscriminant analysis) 
+### Ensamble
 from sklearn.ensemble import VotingClassifier
 # Voting Classifier
-eclf = VotingClassifier(estimators = [('Logit', logit_l2), ('Naive Bayes', nb), ('kNN', knn), ('Decision Tree', tree)], voting = 'hard')
+eclf = VotingClassifier(estimators = [('Logit', logit_l2), ('Naive Bayes', nb), ('kNN', knn), ('Decision Tree', tree), ('Discriminant Analysis', lda)], voting = 'hard')
 
 eclf.fit(X_train, y_train)
 
