@@ -344,7 +344,7 @@ X = pd.concat([X, flags], axis=1)
 
 
 ##### Modeling 
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_auc_score, precision_score
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, roc_auc_score, precision_score, recall_score
 
 
 # Split dataset 
@@ -375,8 +375,7 @@ df1_downsampled = pd.concat([df1_mino, df1_majo_downsampled])
 X_train2 = df1_downsampled.iloc[:, :-1]
 y_train2 = df1_downsampled.iloc[:,-1]
 
-# after check with LogisticRegression L1 & L2, type1 works better, and L2 is same as incite funtion 'class_weight'
-# Therefore, Type1 data, will be used on following Modeling, but not evalution(which based on test data).
+# after test with all the models with unbalanced, or two differnt weights methods, we choose type 1
 X_train = X_train1
 y_train = y_train1
 
@@ -392,8 +391,6 @@ print("testset -ve response: {0}".format(num_response0))
 
 
 
-X_train = X_train2
-y_train = y_train2
 # =============================================================================
 ### Model1: Naive bayes 
 from sklearn.naive_bayes import GaussianNB, BernoulliNB
@@ -430,15 +427,15 @@ nb_speci = nb_confusion[0,0]/np.sum(nb_confusion[0,:]).round(3)
 nb_auc = roc_auc_score(y_test, nb_prob[:,1]).round(3)
 nb_precision = precision_score(y_test, nb_pred).round(3)
 
+
 columns = ['Combined Naive Bayes']
 rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 
 nb_score = pd.DataFrame([nb_mis, nb_se, nb_sensi, nb_speci, nb_auc, nb_precision], columns = columns, index = rows)
 print(nb_score)
 
-
 # Confidence interval
-n_iterations = 1000
+n_iterations = 10000
 n_size = len(y_test)
 test = nb_test
 
@@ -481,8 +478,9 @@ rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 logit_score = pd.DataFrame([logit_mis, logit_se, logit_sensi, logit_speci, logit_auc, logit_precision], columns = columns, index = rows)
 
 
+
 # Confidence interval
-n_iterations = 1000
+n_iterations = 10000
 n_size = len(y_test)
 test = X_test
 
@@ -527,7 +525,7 @@ logit_l1_score = pd.DataFrame([logit_l1_mis, logit_l1_se, logit_l1_sensi, logit_
 
 
 # Confidence interval
-n_iterations = 1000
+n_iterations = 10000
 n_size = len(y_test)
 test = X_test
 
@@ -571,7 +569,7 @@ rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 logit_l2_score = pd.DataFrame([logit_l2_mis, logit_l2_se, logit_l2_sensi, logit_l2_speci, logit_l2_auc, logit_l2_precision], columns = columns, index = rows)
 
 # Confidence interval
-n_iterations = 1000
+n_iterations = 10000
 n_size = len(y_test)
 test = X_test
 
@@ -617,7 +615,7 @@ rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 lda_score = pd.DataFrame([lda_mis, lda_se, lda_sensi, lda_speci, lda_auc, lda_precision], columns = columns, index = rows)
 
 # Confidence interval
-n_iterations = 1000
+n_iterations = 10000
 n_size = len(y_test)
 test = X_test_num
 
@@ -663,7 +661,7 @@ rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 qda_score = pd.DataFrame([qda_mis, qda_se, qda_sensi, qda_speci, qda_auc, qda_precision], columns = columns, index = rows)
 
 # Confidence interval
-n_iterations = 1000
+n_iterations = 10000
 n_size = len(y_test)
 test = X_test_num
 
@@ -715,7 +713,7 @@ rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 qda_reg_score = pd.DataFrame([qda_reg_mis, qda_reg_se, qda_reg_sensi, qda_reg_speci, qda_reg_auc, qda_reg_precision], columns = columns, index = rows)
 
 # Confidence interval
-n_iterations = 1000
+n_iterations = 10000
 n_size = len(y_test)
 test = X_test_num
 
@@ -737,54 +735,54 @@ print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100,
 
 # =============================================================================
 #### Model 4 - KNN
-#from sklearn import neighbors
-#from sklearn.neighbors import KNeighborsClassifier
-#
-#
-##Gridsearch, model fit
-#k_grid = {"n_neighbors": np.arange(1, 32, 1)}
-#knn = GridSearchCV(neighbors.KNeighborsClassifier(), k_grid, cv = 5)
-#knn.fit(X_train, y_train)
-#knn_cv = knn.best_estimator_
-#knn_cv.fit(X_train, y_train)
-#
-## predict
-#knn_pred = knn_cv.predict(X_test)
-#knn_prob = knn_cv.predict_proba(X_test)
-#
-#knn_confusion = confusion_matrix(y_test, knn_pred)
-#knn_mis = (1- accuracy_score(y_test, knn_pred)).round(3)
-#knn_se = np.sqrt(knn_mis*(1- knn_mis)/len(y_test)).round(3)
-#knn_sensi = knn_confusion[1,1]/np.sum(knn_confusion[1,:]).round(3)
-#knn_speci = knn_confusion[0,0]/np.sum(knn_confusion[0,:]).round(3)
-#knn_auc = roc_auc_score(y_test, knn_prob[:,1]).round(3)
-#knn_precision = precision_score(y_test, knn_pred).round(3)
-#
-#columns = ['KNN']
-#rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
-#
-#knn_score = pd.DataFrame([knn_mis, knn_se, knn_sensi, knn_speci, knn_auc, knn_precision], columns = columns, index = rows)
-#
-#
-## Confidence interval
-#n_iterations = 1000
-#n_size = len(y_test)
-#test = X_test
-#
-#accy = list()
-#for i in range(n_iterations):
-#    test = resample(test, n_samples=n_size)
-#    y_pred = knn_cv.predict(test)
-#    score = accuracy_score(y_test, y_pred)
-#    accy.append(score)
-#
-#alpha = 0.95
-#p = ((1-alpha)/2) * 100
-#ci_low = np.percentile(accy, p)
-#q = (1-((1-alpha)/2)) * 100
-#ci_high = np.percentile(accy, q)
-#
-#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+from sklearn import neighbors
+from sklearn.neighbors import KNeighborsClassifier
+
+
+#Gridsearch, model fit
+k_grid = {"n_neighbors": np.arange(1, 32, 1)}
+knn = GridSearchCV(neighbors.KNeighborsClassifier(), k_grid, cv = 5, n_jobs=-1)
+knn.fit(X_train, y_train)
+knn_cv = knn.best_estimator_
+knn_cv.fit(X_train, y_train)
+
+# predict
+knn_pred = knn_cv.predict(X_test)
+knn_prob = knn_cv.predict_proba(X_test)
+
+knn_confusion = confusion_matrix(y_test, knn_pred)
+knn_mis = (1- accuracy_score(y_test, knn_pred)).round(3)
+knn_se = np.sqrt(knn_mis*(1- knn_mis)/len(y_test)).round(3)
+knn_sensi = knn_confusion[1,1]/np.sum(knn_confusion[1,:]).round(3)
+knn_speci = knn_confusion[0,0]/np.sum(knn_confusion[0,:]).round(3)
+knn_auc = roc_auc_score(y_test, knn_prob[:,1]).round(3)
+knn_precision = precision_score(y_test, knn_pred).round(3)
+
+columns = ['KNN']
+rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+
+knn_score = pd.DataFrame([knn_mis, knn_se, knn_sensi, knn_speci, knn_auc, knn_precision], columns = columns, index = rows)
+
+
+# Confidence interval
+n_iterations = 10000
+n_size = len(y_test)
+test = X_test
+
+accy = list()
+for i in range(n_iterations):
+    test = resample(test, n_samples=n_size)
+    y_pred = knn_cv.predict(test)
+    score = accuracy_score(y_test, y_pred)
+    accy.append(score)
+
+alpha = 0.95
+p = ((1-alpha)/2) * 100
+ci_low = np.percentile(accy, p)
+q = (1-((1-alpha)/2)) * 100
+ci_high = np.percentile(accy, q)
+
+print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
 
 # =============================================================================
 ### Model 5- Decision Tree
@@ -819,7 +817,7 @@ tree_score = pd.DataFrame([tree_mis, tree_se, tree_sensi, tree_speci, tree_auc, 
 
 
 # Confidence interval
-n_iterations = 1000
+n_iterations = 10000
 n_size = len(y_test)
 test = X_test
 
@@ -840,69 +838,86 @@ print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100,
 
 
 ## =============================================================================
-#### Emsamble(w/o Dscriminant analysis) [跑不动]
-#from sklearn.ensemble import VotingClassifier
-## Voting Classifier
-#eclf = VotingClassifier(estimators = [('Logit', logit), ('Naive Bayes', nb), ('kNN', knn), ('Decision Tree', tree)], voting = 'hard')
-#
-#eclf.fit(X_train, y_train)
-#
-##predict
-#eclf_pred= eclf.predict(X_test)
-#eclf_prob = eclf.predict_proba(X_test)
-#
-#eclf_confusion = confusion_matrix(y_test, eclf_pred)
-#eclf_mis = (1- accuracy_score(y_test, eclf_pred)).round(3)
-#eclf_se = np.sqrt(eclf_mis*(1- eclf_mis)/len(y_test)).round(3)
-#eclf_sensi = eclf_confusion[1,1]/np.sum(eclf_confusion[1,:]).round(3)
-#eclf_speci = eclf_confusion[0,0]/np.sum(eclf_confusion[0,:]).round(3)
-#eclf_auc = roc_auc_score(y_test, eclf_prob[:,1]).round(3)
-#eclf_precision = precision_score(y_test, eclf_pred).round(3)
-#
-#columns = ['Emsamble']
-#rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
-#
-#eclf_score = pd.DataFrame([eclf_mis, eclf_se, eclf_sensi, eclf_speci, eclf_auc, eclf_precision], columns = columns, index = rows)
-#
-## Confidence interval
-#n_iterations = 1000
-#n_size = len(y_test)
-#test = X_test
-#
-#accy = list()
-#for i in range(n_iterations):
-#    test = resample(test, n_samples=n_size)
-#    y_pred = eclf.predict(test)
-#    score = accuracy_score(y_test, y_pred)
-#    accy.append(score)
-#
-#alpha = 0.95
-#p = ((1-alpha)/2) * 100
-#ci_low = np.percentile(accy, p)
-#q = (1-((1-alpha)/2)) * 100
-#ci_high = np.percentile(accy, q)
-#
-#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+### Emsamble(w/o Dscriminant analysis) 
+from sklearn.ensemble import VotingClassifier
+# Voting Classifier
+eclf = VotingClassifier(estimators = [('Logit', logit_l2), ('Naive Bayes', nb), ('kNN', knn), ('Decision Tree', tree)], voting = 'hard')
+
+eclf.fit(X_train, y_train)
+
+#predict
+eclf_pred= eclf.predict(X_test)
+eclf_prob = eclf.predict_proba(X_test)
+
+eclf_confusion = confusion_matrix(y_test, eclf_pred)
+eclf_mis = (1- accuracy_score(y_test, eclf_pred)).round(3)
+eclf_se = np.sqrt(eclf_mis*(1- eclf_mis)/len(y_test)).round(3)
+eclf_sensi = eclf_confusion[1,1]/np.sum(eclf_confusion[1,:]).round(3)
+eclf_speci = eclf_confusion[0,0]/np.sum(eclf_confusion[0,:]).round(3)
+eclf_auc = roc_auc_score(y_test, eclf_prob[:,1]).round(3)
+eclf_precision = precision_score(y_test, eclf_pred).round(3)
+
+columns = ['Emsamble']
+rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+
+eclf_score = pd.DataFrame([eclf_mis, eclf_se, eclf_sensi, eclf_speci, eclf_auc, eclf_precision], columns = columns, index = rows)
+
+# Confidence interval
+n_iterations = 10000
+n_size = len(y_test)
+test = X_test
+
+accy = list()
+for i in range(n_iterations):
+    test = resample(test, n_samples=n_size)
+    y_pred = eclf.predict(test)
+    score = accuracy_score(y_test, y_pred)
+    accy.append(score)
+
+alpha = 0.95
+p = ((1-alpha)/2) * 100
+ci_low = np.percentile(accy, p)
+q = (1-((1-alpha)/2)) * 100
+ci_high = np.percentile(accy, q)
+
+print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
 # =============================================================================
 # =============================================================================
 
 ### Model Evalaution
-summary = pd.concat([nb_score, logit_score, logit_l1_score, logit_l2_score, tree_score, lda_score, qda_score, qda_reg_score], axis=1)                
+summary = pd.concat([nb_score, logit_score, logit_l1_score, logit_l2_score, tree_score, lda_score, qda_score, qda_reg_score, eclf_score], axis=1)                
 summary.to_csv('Model evaluation_summary.csv')
 
-# knn_score,
+
+
+print(nb_confusion)
+print(logit_confusion)
+print(logit_l1_confusion)
+print(logit_l2_confusion)
+print(lda_confusion)
+print(qda_confusion)
+print(qda_reg_confusion)
+print(knn_confusion)
+print(tree_confusion)
+print(eclf_confusion)
+
+
+
+
 # ROC curve
-palette = ['#1F77B4', '#FF7F0E', '#2CA02C', '#980002', '#9ffeb0', '#516572', '#4b006e', '#DB2728', '#9467BD', '#95A5A6', '#34495E', '#137e6d']
+#palette = ['#1F77B4', '#FF7F0E', '#2CA02C', '#980002', '#9ffeb0', '#516572', '#4b006e', '#DB2728', '#9467BD', '#95A5A6', '#34495E', '#137e6d']
+
+palette = ['#1F77B4', '#FF7F0E', '#2CA02C', '#DB2728', '#9467BD', '#9467BD']
 
 from sklearn.metrics import roc_curve
 
-labels=['Logistic regression', 'L1 regularised', 'L2 regularised', 'Tree_depths', 'Tree_features', 'KNN', 'AdaBoost', 'Neural network', 'Gaussian Naive Bayes', 'LDA', 'QDA', 'Regularised QDA']
-methods=[nb, logit, logit_l1, logit_l2, knn, tree, eclf, lda, qda, qda_reg]
+labels=['Naive Bayes', 'L2 regularised', 'KNN', 'Decision Tree', 'Ensambled', 'LDA']
+methods=[nb, logit_l2, knn, tree, eclf, lda]
 
 fig, ax= plt.subplots(figsize=(9,6))
 
 for i, method in enumerate(methods):
-    if i < 9:
+    if i < 5:
         y_prob = method.predict_proba(X_test)
     else:
         y_prob = method.predict_proba(X_test_num)
@@ -921,8 +936,39 @@ fig.savefig('ROC.pdf')
 
 # feature_importance
 from statlearning import plot_feature_importance
-plot_feature_importance(rf, predictors)
+plot_feature_importance(tree, X_train)
 plt.show()
+fig.savefig('best features.pdf')
 
-
+## =============================================================================
+#
+## Random Foreast [bagging] [have a try]
+#from sklearn.ensemble import RandomForestClassifier 
+## Gridsearch
+#model = RandomForestClassifier(n_estimators=1000)
+#tuning_parameters = [{'min_samples_leaf': [1,5,10],'max_features': list(np.arange(2,len(X_train))),}]
+#
+## the n_jobs option enables parallel processing
+#rfg = GridSearchCV(model, tuning_parameters, cv=5, return_train_score=False, n_jobs=-1)
+#rfg.fit(X_train, y_train)
+#rf = rfg.best_estimator_
+#rf.fit(X_train, y_train)
+#
+#
+## Predict
+#rf_pred = rf.predict(X_test)
+#rf_prob = rf.predict_proba(X_test)
+#
+#rf_confusion = confusion_matrix(y_test, rf_pred)
+#rf_mis = (1- accuracy_score(y_test, rf_pred)).round(3)
+#rf_se = np.sqrt(rf_mis*(1- rf_mis)/len(y_test)).round(3)
+#rf_sensi = rf_confusion[1,1]/np.sum(rf_confusion[1,:]).round(3)
+#rf_speci = rf_confusion[0,0]/np.sum(rf_confusion[0,:]).round(3)
+#rf_auc = roc_auc_score(y_test, rf_prob[:,1]).round(3)
+#rf_precision = precision_score(y_test, rf_pred).round(3)
+#
+#columns = ['Decision Tree_features']
+#rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+#
+#rf_score = pd.DataFrame([rf_mis, rf_se, rf_sensi, rf_speci, rf_auc, rf_precision], columns = columns, index = rows)
 
