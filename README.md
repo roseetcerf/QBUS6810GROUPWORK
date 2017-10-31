@@ -74,3 +74,8 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 - ci也处理完了，只剩下模型整合了。 关于ci的解释，可参考p44~~ 
 - 【待处理】：模型整合，优化图片，出最优模型features，完善jupyter。 
 - 【大头全部结束啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦！！！！！！】
+
+## ~xy.10.31
+- [code] 改了ci（变成模型不变，只iterate testset来做出predict和real对比）
+- 模型组合结束，确定了weight。
+- 【待处理】：set最终版code，优化图片，复查examples（report和code），完善jupyter。
