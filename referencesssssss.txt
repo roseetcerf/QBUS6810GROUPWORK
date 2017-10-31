@@ -1,0 +1,42 @@
+Reference
+
+¡¶inbalanced dataset¡·
+https://elitedatascience.com/imbalanced-classes
+
+
+balance1 ¡¾29016¡¿
+the 95% confidence interval is (56.02, 79.51)
+the 95% confidence interval is (45.97, 59.61)
+the 95% confidence interval is (61.04, 77.07)
+the 95% confidence interval is (45.31, 62.83)
+D:\Users\Administrator\Anaconda3\lib\site-packages\sklearn\discriminant_analysis.py:387: UserWarning: Variables are collinear.
+  warnings.warn("Variables are collinear.")
+the 95% confidence interval is (54.73, 68.77)
+the 95% confidence interval is (61.68, 76.54)
+the 95% confidence interval is (47.26, 64.33)
+the 95% confidence interval is (54.76, 78.31)
+
+
+unbalanced ¡¾17392¡¿
+the 95% confidence interval is (54.35, 67.43)
+the 95% confidence interval is (71.43, 81.95)
+the 95% confidence interval is (77.37, 83.28)
+the 95% confidence interval is (58.90, 77.55)
+D:\Users\Administrator\Anaconda3\lib\site-packages\sklearn\discriminant_analysis.py:387: UserWarning: Variables are collinear.
+  warnings.warn("Variables are collinear.")
+the 95% confidence interval is (78.17, 83.28)
+the 95% confidence interval is (53.59, 71.57)
+the 95% confidence interval is (59.45, 75.76)
+the 95% confidence interval is (77.44, 82.25)
+
+balanced ¡¾5768¡¿
+the 95% confidence interval is (47.26, 64.33)
+the 95% confidence interval is (57.96, 75.07)
+the 95% confidence interval is (25.64, 58.74)
+the 95% confidence interval is (44.66, 62.31)
+D:\Users\Administrator\Anaconda3\lib\site-packages\sklearn\discriminant_analysis.py:387: UserWarning: Variables are collinear.
+  warnings.warn("Variables are collinear.")
+the 95% confidence interval is (53.40, 77.32)
+the 95% confidence interval is (57.31, 69.30)
+the 95% confidence interval is (61.31, 74.82)
+the 95% confidence interval is (57.93, 71.23)
