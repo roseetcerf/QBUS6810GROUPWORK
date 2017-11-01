@@ -79,3 +79,9 @@ postage来源：https://auspost.com.au/business/marketing-and-communications/bul
 - [code] 改了ci（变成模型不变，只iterate testset来做出predict和real对比）
 - 模型组合结束，确定了weight。
 - 【待处理】：set最终版code，优化图片，复查examples（report和code），完善jupyter。
+
+## ~xy.11.1
+- changed pred to prob.   USE boostingmean to test it[function]
+- need to add adaBoost, switch knn, try to run RF.
+- add AUCPC (prob of percision). check weither weighted score would be better.
+- try box-cox in continuous feature engineering~ [maybe]
