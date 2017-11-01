@@ -442,8 +442,8 @@ test = nb_test
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = nb.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = nb.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
@@ -487,8 +487,8 @@ test = X_test
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = logit.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = lotig.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
@@ -532,8 +532,8 @@ test = X_test
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = logit_l1.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = lotig_l1.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
@@ -576,8 +576,8 @@ test = X_test
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = logit_l2.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = lotig_l2.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
@@ -622,8 +622,8 @@ test = X_test_num
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = lda.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = lda.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
@@ -668,8 +668,8 @@ test = X_test_num
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = qda.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = qda.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
@@ -720,8 +720,8 @@ test = X_test_num
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = qda_reg.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = qda_reg.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
@@ -772,8 +772,8 @@ test = X_test
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = knn_cv.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = knn_cv.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
@@ -824,8 +824,8 @@ test = X_test
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = tree.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = tree.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
@@ -870,8 +870,8 @@ test = X_test
 accy = list()
 for i in range(n_iterations):
     test = resample(test, n_samples=n_size)
-    y_pred = eclf.predict(test)
-    score = accuracy_score(y_test, y_pred)
+    y_prob = eclf.predict_proba(test)
+    score = accuracy_score(y_test, y_prob)
     accy.append(score)
 
 alpha = 0.95
