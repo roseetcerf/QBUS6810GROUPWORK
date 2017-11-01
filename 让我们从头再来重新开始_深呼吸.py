@@ -36,8 +36,8 @@ y = df.iloc[:,-1]
 
 # missing value check
 import scipy as sp
-sp.sum(sp.isnan(X)) 
-sp.sum(sp.isnan(y)) 
+check_x= sp.sum(sp.isnan(X)) 
+check_y = sp.sum(sp.isnan(y)) 
 
 ## data understanding & preparation (EDA, graph, descript)
 
@@ -51,10 +51,17 @@ style_prob = pd.DataFrame(style_prob)
 style_prob = pd.DataFrame({'lifestyle':style_prob[0], 'prob': style_prob[1]})
 style_prob.head()
 
+
+## Numerical variables
+# Normalization
+from sklearn import preprocessing
+X_num = X.drop(['CC_CARD','VALPHON','WEB'], axis=1)
+
+
 # skew + kurtosis
-descrip = X.describe()
-descrip.loc['skew', :] = X.skew()
-descrip.loc['kurt', :] = X.kurt()
+descrip = X_num.describe()
+descrip.loc['skew', :] = X_num.skew()
+descrip.loc['kurt', :] = X_num.kurt()
 print(descrip.round(3))
 
 def hist(series):
@@ -63,18 +70,13 @@ def hist(series):
                                         kde_kws={'color':'black','alpha':0.7})
     return fig, ax
 
-fig = plt.figure()
-hist(X['HI'])
-sns.despine()   
-plt.show()
-fig.savefig('Product uniformity.pdf')      #### [存不下来啊？！！？！,自定义的function？]
 
-
-## Numerical variables
-# Normalization
-from sklearn import preprocessing
-X_num = X.drop(['CC_CARD','VALPHON','WEB'], axis=1)
-
+hist_ori = ['CLASSES', 'RESPONSERATE', 'PERCRET']
+for i in hist_ori:
+    hist(X[i])
+    sns.despine()
+    plt.savefig("hist_ori_" + i + ".pdf")
+    
 
 # no '0' - natural log transformation
 X_num1 = X_num.loc[:, (X_num != 0).all(axis=0)]
@@ -84,26 +86,28 @@ X_log = np.log(X_num1)
 X_num0 = X_num.drop(X_num1, axis=1)
 X_sqrt = np.sqrt(X_num0)
 
-
 X_num = pd.concat([X_log, X_sqrt], axis=1)
 
 
-# test with above example variable
-fig = plt.figure()
-hist(X_num['HI'])
-sns.despine()   
-plt.show()
-plt.savefig('Product uniformity.pdf')      #### [存不下来啊？！！？！,自定义的function？]
+# test with above example variables
+hist_trans = hist_ori
+for i in hist_trans:
+    hist(X_num[i])
+    sns.despine()
+    plt.savefig("hist_trans_" + i + ".pdf")    
 
 
 # 15 closing varaibles - choose one as example
-plt.figure()
-hist(X['PJACKETS'])
-hist(X_num['PJACKETS'])
-sns.despine() 
-plt.show()
-fig.savefig('PJACKETS.pdf')      #### [存不下来啊？！！？！,自定义的function？]
-
+type_ori = ['PSWEATERS','PKNIT_TOPS','PKNIT_DRES','PBLOUSES','PJACKETS','PCAR_PNTS','PCAS_PNTS','PSHIRTS','PDRESSES','PSUITS','POUTERWEAR','PJEWELRY','PFASHION','PLEGWEAR','PCOLLSPND']
+for i in type_ori:
+    hist(X[i])
+    sns.despine()
+    plt.savefig("type_ori_" + i + ".pdf")
+for i in type_ori:
+    hist(X_num[i])
+    sns.despine()
+    plt.savefig("type_trans_" + i + ".pdf")
+        
 jacket = Counter(X_num['PJACKETS'])
 print("Proportion of not buy jackets: {0:.2f}%".format(jacket[0]/len(X_num['PJACKETS']) * 100.0))
 
@@ -111,6 +115,9 @@ print("Proportion of not buy jackets: {0:.2f}%".format(jacket[0]/len(X_num['PJAC
 ## Standerdize
 # differences in std
 descrip = X_num.describe()
+#aaa = np.std(X_num)
+#np.argmin(aaa)
+#np.argmax(aaa)
 print("Std of last 6mos spend: {0:.2f}".format(np.std(X_num['SMONSPEND'])))
 print("Std of coupon spend: {0:.2f}".format(np.std(X_num['COUPONS'])))
 
@@ -120,15 +127,16 @@ X_scale = preprocessing.scale(X_num)
 X_scale = pd.DataFrame(X_scale, columns = X_num.columns, index = X_num.index)
 
 # one variable to prove [6mos spend]
-plt.figure()
-hist(X_scale['SMONSPEND'])
-sns.despine() 
-plt.show()
-fig.savefig('SMONSPEND.pdf')      #### [存不下来啊？！！？！,自定义的function？]
+spent_scl = ['TMONSPEND', 'OMONSPEND', 'SMONSPEND']
+for i in spent_scl:
+    hist(X_scale[i])
+    sns.despine()
+    plt.savefig("spent_sacle" + i + ".pdf")
+
 
 ## derive new variables.
 # amount spent
-X_spent = X_scale[['TMONSPEND', 'OMONSPEND', 'SMONSPEND']]
+X_spent = X_scale[spent_scl]
 
 X_spent23 = X_scale['TMONSPEND']-X_scale['OMONSPEND']
 X_spent23 = pd.DataFrame({'2-3MONSPEND': X_spent23})
@@ -144,17 +152,17 @@ X_scale = pd.concat([X_scale, X_spent_n], axis=1)
 # functional relationship
 X_func = X_scale[['FRE', 'MON', 'AVRG']]
 X_func_corr = X_func.corr()
+print(X_func_corr)
 #return this to below~~~~
 
 
 ## Rough: Relationships b/w the Predictors and the Response
 # merge categoritical variable back
-X_cal = X[['CC_CARD', 'VALPHON', 'WEB']]
-X = pd.concat([X_scale, X_cal], axis = 1)
+X_cat = X[['CC_CARD', 'VALPHON', 'WEB']]
+X = pd.concat([X_scale, X_cat], axis = 1)
 
 corr_y = X.corrwith(y).sort_values(ascending = False)
 corr_y_abs = X.corrwith(y).abs().sort_values(ascending = False)
-print(corr_y.head(8))
 print(corr_y_abs.head(8))
 
 
@@ -170,6 +178,7 @@ plt.legend()
 plt.ylabel("Count")
 plt.title("LTFREDAY w/ differnt response")
 plt.savefig('LTFREDAY with differnt response.pdf')
+
 
 # normalize histograph
 fig, ax = plt.subplots(figsize=(9,7))
@@ -222,13 +231,13 @@ sns.distplot(high_corr_0['FREDAYS'],bins=None, ax=axes[1,2], norm_hist = True, k
 sns.distplot(high_corr_1['FREDAYS'],bins=None, ax=axes[1,2], norm_hist = True, kde=False, label='responsd')
 axes[1,2].legend(loc="upper right")
 
-sns.distplot(high_corr_0['LTFREDAY'],bins=None, ax=axes[0,0], norm_hist = True, kde=False, label='no response')
-sns.distplot(high_corr_1['LTFREDAY'],bins=None, ax=axes[0,0], norm_hist = True, kde=False, label='responsd')
+sns.distplot(high_corr_0['LTFREDAY'],bins=None, ax=axes[1,3], norm_hist = True, kde=False, label='no response')
+sns.distplot(high_corr_1['LTFREDAY'],bins=None, ax=axes[1,3], norm_hist = True, kde=False, label='responsd')
 axes[1,3].legend(loc="upper right")
 
 
-axes[0,0].set_ylabel('Percentage')
-axes[1,0].set_ylabel('Percentage')
+#axes[0,0].set_ylabel('Percentage')
+#axes[1,0].set_ylabel('Percentage')
 plt.suptitle('Norm high_corr variables w/ responses', fontsize=16)
 plt.savefig('Norm high_corr with differnt response.pdf')
 
@@ -250,18 +259,18 @@ plt.savefig('Norm PJACKETS with differnt response.pdf')
 
 
 # Norm Uniformity w/ response
-uni = pd.concat([X['HI'], y], axis=1)
+uni = pd.concat([X['CLASSES'], y], axis=1)
 uni_1 = uni[uni['RESP'] !=0]
 uni_0= uni[uni['RESP'] ==0]
 
 #plot
 fig, ax = plt.subplots(figsize=(9,7))
-sns.distplot(uni_0['HI'],bins=None, ax=ax, norm_hist = True, kde=False, label='no response')
-sns.distplot(uni_1['HI'],bins=None, ax=ax, norm_hist = True, kde=False, label='responsd')
+sns.distplot(uni_0['CLASSES'],bins=None, ax=ax, norm_hist = True, kde=False, label='no response')
+sns.distplot(uni_1['CLASSES'],bins=None, ax=ax, norm_hist = True, kde=False, label='responsd')
 plt.legend()
 plt.ylabel("Percentage")
-plt.title("Norm uniformity w/ differnt response")
-plt.savefig('Norm uniformity with differnt response.pdf')
+plt.title("Norm classes w/ differnt response")
+plt.savefig('Norm classes with differnt response.pdf')
 
 
 ### correlation b/w variables -multicollinearity
@@ -280,6 +289,10 @@ for i in range(len(corr_matrix.columns)):
                 print('high corr exist(-ve): ' +corr_index[i]+ ',' +corr_index[j])
                 print(corr_matrix.iloc[i, j].round(2))
 
+f, ax = plt.subplots(figsize=(12, 9))
+sns.heatmap(corr_matrix, vmax=.8, square=True)
+plt.savefig('corr_matrix.pdf')
+plt.show()
 
 # scatter plot -example
 fig = plt.figure()
@@ -298,7 +311,7 @@ plt.savefig("CLASSES vs. UNIFORMROITY.pdf")
 
 
 # Jacket on flags varaibles & response [sample]
-jacket_flags = pd.concat([jacket, X_cal], axis =1)
+jacket_flags = pd.concat([jacket, X_cat], axis =1)
 
 # prop w/ card + respond
 cardj = jacket_flags[(jacket_flags['PJACKETS'] != 0) & (jacket_flags['RESP'] !=0) & (jacket_flags['CC_CARD'] !=0)]
@@ -419,19 +432,36 @@ nb = GaussianNB().fit(nb_train, np.ravel(y_train))
 nb_pred = nb.predict(nb_test)
 nb_prob = nb.predict_proba(nb_test)
 
+
+# scores
+#model = nb
+#y_pred = nb_pred
+#y_prob = nb_prob
+#nb_confusion = confusion_matrix(y_test, y_pred)
+# m_confusion = nb_confusion
+
+#nb_mis = (1- accuracy_score(y_test, y_pred)).round(3)
+#nb_sensi = m_confusion[1,1]/np.sum(m_confusion[1,:]).round(3)
+#nb_speci = m_confusion[0,0]/np.sum(m_confusion[0,:]).round(3)
+#nb_auc = roc_auc_score(y_test, y_prob[:,1]).round(3)
+#nb_precision = precision_score(y_test, y_pred).round(3)
+#nb_auprc = average_precision_score(y_test, y_probs)
+
+from sklearn.metrics import average_precision_score
+
 nb_confusion = confusion_matrix(y_test, nb_pred)
 nb_mis = (1- accuracy_score(y_test, nb_pred)).round(3)
-nb_se = np.sqrt(nb_mis*(1- nb_mis)/len(y_test)).round(3)
 nb_sensi = nb_confusion[1,1]/np.sum(nb_confusion[1,:]).round(3)
 nb_speci = nb_confusion[0,0]/np.sum(nb_confusion[0,:]).round(3)
 nb_auc = roc_auc_score(y_test, nb_prob[:,1]).round(3)
 nb_precision = precision_score(y_test, nb_pred).round(3)
+nb_auprc=  average_precision_score(y_test, nb_prob)
 
 
 columns = ['Combined Naive Bayes']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-nb_score = pd.DataFrame([nb_mis, nb_se, nb_sensi, nb_speci, nb_auc, nb_precision], columns = columns, index = rows)
+nb_score = pd.DataFrame([nb_mis, nb_sensi, nb_speci, nb_auc, nb_precision, nb_auprc], columns = columns, index = rows)
 print(nb_score)
 
 # Confidence interval
@@ -457,6 +487,8 @@ print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100,
 # =============================================================================
 ##E Model2-1: LogisticRegression
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import precision_score, average_precision_score
+
 logit = LogisticRegression()
 logit.fit(X_train, y_train)
 
@@ -466,39 +498,74 @@ logit_prob = logit.predict_proba(X_test)
 
 logit_confusion = confusion_matrix(y_test, logit_pred)
 logit_mis = (1- accuracy_score(y_test, logit_pred)).round(3)
-logit_se = np.sqrt(logit_mis*(1- logit_mis)/len(y_test)).round(3)
 logit_sensi = logit_confusion[1,1]/np.sum(logit_confusion[1,:]).round(3)
 logit_speci = logit_confusion[0,0]/np.sum(logit_confusion[0,:]).round(3)
 logit_auc = roc_auc_score(y_test, logit_prob[:,1]).round(3)
 logit_precision = precision_score(y_test, logit_pred).round(3)
+logit_auprc= average_precision_score(y_test, logit_prob[:,1])
 
 columns = ['Logistic']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+rows = ['Error rate','Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-logit_score = pd.DataFrame([logit_mis, logit_se, logit_sensi, logit_speci, logit_auc, logit_precision], columns = columns, index = rows)
+logit_score = pd.DataFrame([logit_mis, logit_sensi, logit_speci, logit_auc, logit_precision, logit_auprc], columns = columns, index = rows)
+
+######################## test
+model = logit_confusion
+loss_TN = model[0, 0] *0
+loss_TP = model[1, 1] *(-43.56)
+loss_FN = model[1, 0] * (45.56)
+loss_FP = model[0, 1] * (2)
+
+y_prob = logit_prob
+
+
+#loss_ave = [y_prob[:, -1]*(-loss_TP - loss_TN) + y_prob[:, 0]*(-loss_FP - loss_FN)]/len(y_test)
+
+n = len(y_test)
+tptn =y_prob[:, -1]*(-loss_TP - loss_TN)
+tptn_ave = tptn/n
+fpfn = y_prob[:, 0]*(-loss_FP - loss_FN)
+fpfn_ave = fpfn/n
+loss_ave = tptn_ave + fpfn_ave
+
+
+#loss_ave = (loss_TN + loss_TP + loss_FN + loss_FP)/len(y_test) [不对]
+
+
+from statlearning import bootstrap_mean, plot_histogram
+
+mean_boot, ci_low, ci_high = bootstrap_mean(loss_ave, S=10000, alpha=0.05)
+
+print('Average loss = {0:.2f}'.format(np.mean(loss_ave)))
+print(r'Bootstrap t confidence interval (95%) = ({0:.2f}, {1:.2f})'.format(ci_low, ci_high))
+
+fig, ax = plot_histogram(mean_boot - np.mean(loss_ave))
+ax.set_title('Bootstrap distribution')
+plt.show()
+#################### test
 
 
 
-# Confidence interval
-n_iterations = 10000
-n_size = len(y_test)
-test = X_test
-
-accy = list()
-for i in range(n_iterations):
-    test = resample(test, n_samples=n_size)
-    y_prob = lotig.predict_proba(test)
-    score = accuracy_score(y_test, y_prob)
-    accy.append(score)
-
-alpha = 0.95
-p = ((1-alpha)/2) * 100
-ci_low = np.percentile(accy, p)
-q = (1-((1-alpha)/2)) * 100
-ci_high = np.percentile(accy, q)
-
-print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+## Confidence interval
+#n_iterations = 10000
+#n_size = len(y_test)
+#test = X_test
 #
+#accy = list()
+#for i in range(n_iterations):
+#    test = resample(test, n_samples=n_size)
+#    y_prob = logit.predict_proba(test)
+#    score = accuracy_score(y_test, y_prob)
+#    accy.append(score)
+#
+#alpha = 0.95
+#p = ((1-alpha)/2) * 100
+#ci_low = np.percentile(accy, p)
+#q = (1-((1-alpha)/2)) * 100
+#ci_high = np.percentile(accy, q)
+#
+#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+##
 #
 # =============================================================================
 ### Model 2-2: LogisticRegressionCV (L1 - lasso)
@@ -512,38 +579,38 @@ logit_l1_prob = logit_l1.predict_proba(X_test)
 
 logit_l1_confusion = confusion_matrix(y_test, logit_l1_pred)
 logit_l1_mis = (1- accuracy_score(y_test, logit_l1_pred)).round(3)
-logit_l1_se = np.sqrt(logit_l1_mis*(1- logit_l1_mis)/len(y_test)).round(3)
 logit_l1_sensi = logit_l1_confusion[1,1]/np.sum(logit_l1_confusion[1,:]).round(3)
 logit_l1_speci = logit_l1_confusion[0,0]/np.sum(logit_l1_confusion[0,:]).round(3)
 logit_l1_auc = roc_auc_score(y_test, logit_l1_prob[:,1]).round(3)
 logit_l1_precision = precision_score(y_test, logit_l1_pred).round(3)
+logit_l1_auprc= average_precision_score(y_test, logit_l1_prob)
 
 columns = ['L1 regularised']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-logit_l1_score = pd.DataFrame([logit_l1_mis, logit_l1_se, logit_l1_sensi, logit_l1_speci, logit_l1_auc, logit_l1_precision], columns = columns, index = rows)
+logit_l1_score = pd.DataFrame([logit_l1_mis, logit_l1_sensi, logit_l1_speci, logit_l1_auc, logit_l1_precision, logit_l1_auprc], columns = columns, index = rows)
 
 
-# Confidence interval
-n_iterations = 10000
-n_size = len(y_test)
-test = X_test
-
-accy = list()
-for i in range(n_iterations):
-    test = resample(test, n_samples=n_size)
-    y_prob = lotig_l1.predict_proba(test)
-    score = accuracy_score(y_test, y_prob)
-    accy.append(score)
-
-alpha = 0.95
-p = ((1-alpha)/2) * 100
-ci_low = np.percentile(accy, p)
-q = (1-((1-alpha)/2)) * 100
-ci_high = np.percentile(accy, q)
-
-print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+## Confidence interval
+#n_iterations = 10000
+#n_size = len(y_test)
+#test = X_test
 #
+#accy = list()
+#for i in range(n_iterations):
+#    test = resample(test, n_samples=n_size)
+#    y_prob = logit_l1.predict_proba(test)
+#    score = accuracy_score(y_test, y_prob)
+#    accy.append(score)
+#
+#alpha = 0.95
+#p = ((1-alpha)/2) * 100
+#ci_low = np.percentile(accy, p)
+#q = (1-((1-alpha)/2)) * 100
+#ci_high = np.percentile(accy, q)
+#
+#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+##
 #
 # =============================================================================
 ### Model 2-3: LogisticRegressionCV (L2 - Ridge)
@@ -557,36 +624,36 @@ logit_l2_prob = logit_l2.predict_proba(X_test)
 
 logit_l2_confusion = confusion_matrix(y_test, logit_l2_pred)
 logit_l2_mis = (1- accuracy_score(y_test, logit_l2_pred)).round(3)
-logit_l2_se = np.sqrt(logit_l2_mis*(1- logit_l2_mis)/len(y_test)).round(3)
 logit_l2_sensi = logit_l2_confusion[1,1]/np.sum(logit_l2_confusion[1,:]).round(3)
 logit_l2_speci = logit_l2_confusion[0,0]/np.sum(logit_l2_confusion[0,:]).round(3)
 logit_l2_auc = roc_auc_score(y_test, logit_l2_prob[:,1]).round(3)
 logit_l2_precision = precision_score(y_test, logit_l2_pred).round(3)
+logit_l2_auprc= average_precision_score(y_test, logit_l2_prob)
 
 columns = ['L2 regularised']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-logit_l2_score = pd.DataFrame([logit_l2_mis, logit_l2_se, logit_l2_sensi, logit_l2_speci, logit_l2_auc, logit_l2_precision], columns = columns, index = rows)
+logit_l2_score = pd.DataFrame([logit_l2_mis, logit_l2_sensi, logit_l2_speci, logit_l2_auc, logit_l2_precision,logit_l2_auprc], columns = columns, index = rows)
 
-# Confidence interval
-n_iterations = 10000
-n_size = len(y_test)
-test = X_test
-
-accy = list()
-for i in range(n_iterations):
-    test = resample(test, n_samples=n_size)
-    y_prob = lotig_l2.predict_proba(test)
-    score = accuracy_score(y_test, y_prob)
-    accy.append(score)
-
-alpha = 0.95
-p = ((1-alpha)/2) * 100
-ci_low = np.percentile(accy, p)
-q = (1-((1-alpha)/2)) * 100
-ci_high = np.percentile(accy, q)
-
-print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+## Confidence interval
+#n_iterations = 10000
+#n_size = len(y_test)
+#test = X_test
+#
+#accy = list()
+#for i in range(n_iterations):
+#    test = resample(test, n_samples=n_size)
+#    y_prob = logit_l2.predict_proba(test)
+#    score = accuracy_score(y_test, y_prob)
+#    accy.append(score)
+#
+#alpha = 0.95
+#p = ((1-alpha)/2) * 100
+#ci_low = np.percentile(accy, p)
+#q = (1-((1-alpha)/2)) * 100
+#ci_high = np.percentile(accy, q)
+#
+#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
 
 # =============================================================================
 ### Model 3-1 Gaussian Discriminant analysis [numerical only]  - LDA
@@ -603,36 +670,36 @@ lda_prob = lda.predict_proba(X_test_num)
 
 lda_confusion = confusion_matrix(y_test, lda_pred)
 lda_mis = (1- accuracy_score(y_test, lda_pred)).round(3)
-lda_se = np.sqrt(lda_mis*(1- lda_mis)/len(y_test)).round(3)
 lda_sensi = lda_confusion[1,1]/np.sum(lda_confusion[1,:]).round(3)
 lda_speci = lda_confusion[0,0]/np.sum(lda_confusion[0,:]).round(3)
 lda_auc = roc_auc_score(y_test, lda_prob[:,1]).round(3)
 lda_precision = precision_score(y_test, lda_pred).round(3)
+lda_auprc= average_precision_score(y_test, lda_prob)
 
 columns = ['LDA']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+rows = ['Error rate','Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-lda_score = pd.DataFrame([lda_mis, lda_se, lda_sensi, lda_speci, lda_auc, lda_precision], columns = columns, index = rows)
+lda_score = pd.DataFrame([lda_mis, lda_sensi, lda_speci, lda_auc, lda_precision,lda_auprc], columns = columns, index = rows)
 
-# Confidence interval
-n_iterations = 10000
-n_size = len(y_test)
-test = X_test_num
-
-accy = list()
-for i in range(n_iterations):
-    test = resample(test, n_samples=n_size)
-    y_prob = lda.predict_proba(test)
-    score = accuracy_score(y_test, y_prob)
-    accy.append(score)
-
-alpha = 0.95
-p = ((1-alpha)/2) * 100
-ci_low = np.percentile(accy, p)
-q = (1-((1-alpha)/2)) * 100
-ci_high = np.percentile(accy, q)
-
-print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+## Confidence interval
+#n_iterations = 10000
+#n_size = len(y_test)
+#test = X_test_num
+#
+#accy = list()
+#for i in range(n_iterations):
+#    test = resample(test, n_samples=n_size)
+#    y_prob = lda.predict_proba(test)
+#    score = accuracy_score(y_test, y_prob)
+#    accy.append(score)
+#
+#alpha = 0.95
+#p = ((1-alpha)/2) * 100
+#ci_low = np.percentile(accy, p)
+#q = (1-((1-alpha)/2)) * 100
+#ci_high = np.percentile(accy, q)
+#
+#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
 
 # =============================================================================
 ### Model 3-2: QDA
@@ -649,36 +716,36 @@ qda_prob = qda.predict_proba(X_test_num)
 
 qda_confusion = confusion_matrix(y_test, qda_pred)
 qda_mis = (1- accuracy_score(y_test, qda_pred)).round(3)
-qda_se = np.sqrt(qda_mis*(1- qda_mis)/len(y_test)).round(3)
 qda_sensi = qda_confusion[1,1]/np.sum(qda_confusion[1,:]).round(3)
 qda_speci = qda_confusion[0,0]/np.sum(qda_confusion[0,:]).round(3)
 qda_auc = roc_auc_score(y_test, qda_prob[:,1]).round(3)
 qda_precision = precision_score(y_test, qda_pred).round(3)
+qda_auprc= average_precision_score(y_test, qda_prob)
 
 columns = ['QDA']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-qda_score = pd.DataFrame([qda_mis, qda_se, qda_sensi, qda_speci, qda_auc, qda_precision], columns = columns, index = rows)
+qda_score = pd.DataFrame([qda_mis, qda_sensi, qda_speci, qda_auc, qda_precision, qda_auprc], columns = columns, index = rows)
 
-# Confidence interval
-n_iterations = 10000
-n_size = len(y_test)
-test = X_test_num
-
-accy = list()
-for i in range(n_iterations):
-    test = resample(test, n_samples=n_size)
-    y_prob = qda.predict_proba(test)
-    score = accuracy_score(y_test, y_prob)
-    accy.append(score)
-
-alpha = 0.95
-p = ((1-alpha)/2) * 100
-ci_low = np.percentile(accy, p)
-q = (1-((1-alpha)/2)) * 100
-ci_high = np.percentile(accy, q)
-
-print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+## Confidence interval
+#n_iterations = 10000
+#n_size = len(y_test)
+#test = X_test_num
+#
+#accy = list()
+#for i in range(n_iterations):
+#    test = resample(test, n_samples=n_size)
+#    y_prob = qda.predict_proba(test)
+#    score = accuracy_score(y_test, y_prob)
+#    accy.append(score)
+#
+#alpha = 0.95
+#p = ((1-alpha)/2) * 100
+#ci_low = np.percentile(accy, p)
+#q = (1-((1-alpha)/2)) * 100
+#ci_high = np.percentile(accy, q)
+#
+#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
 
 
 # =============================================================================
@@ -701,88 +768,162 @@ qda_reg_prob = qda_reg.predict_proba(X_test_num)
 
 qda_reg_confusion = confusion_matrix(y_test, qda_reg_pred)
 qda_reg_mis = (1- accuracy_score(y_test, qda_reg_pred)).round(3)
-qda_reg_se = np.sqrt(qda_reg_mis*(1- qda_reg_mis)/len(y_test)).round(3)
 qda_reg_sensi = qda_reg_confusion[1,1]/np.sum(qda_reg_confusion[1,:]).round(3)
 qda_reg_speci = qda_reg_confusion[0,0]/np.sum(qda_reg_confusion[0,:]).round(3)
 qda_reg_auc = roc_auc_score(y_test, qda_reg_prob[:,1]).round(3)
 qda_reg_precision = precision_score(y_test, qda_reg_pred).round(3)
+qda_reg_auprc= average_precision_score(y_test, qda_reg_prob)
 
 columns = ['Regularised QDA']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-qda_reg_score = pd.DataFrame([qda_reg_mis, qda_reg_se, qda_reg_sensi, qda_reg_speci, qda_reg_auc, qda_reg_precision], columns = columns, index = rows)
+qda_reg_score = pd.DataFrame([qda_reg_mis, qda_reg_sensi, qda_reg_speci, qda_reg_auc, qda_reg_precision, qda_reg_auprc], columns = columns, index = rows)
 
-# Confidence interval
-n_iterations = 10000
-n_size = len(y_test)
-test = X_test_num
-
-accy = list()
-for i in range(n_iterations):
-    test = resample(test, n_samples=n_size)
-    y_prob = qda_reg.predict_proba(test)
-    score = accuracy_score(y_test, y_prob)
-    accy.append(score)
-
-alpha = 0.95
-p = ((1-alpha)/2) * 100
-ci_low = np.percentile(accy, p)
-q = (1-((1-alpha)/2)) * 100
-ci_high = np.percentile(accy, q)
-
-print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+## Confidence interval
+#n_iterations = 10000
+#n_size = len(y_test)
+#test = X_test_num
+#
+#accy = list()
+#for i in range(n_iterations):
+#    test = resample(test, n_samples=n_size)
+#    y_prob = qda_reg.predict_proba(test)
+#    score = accuracy_score(y_test, y_prob)
+#    accy.append(score)
+#
+#alpha = 0.95
+#p = ((1-alpha)/2) * 100
+#ci_low = np.percentile(accy, p)
+#q = (1-((1-alpha)/2)) * 100
+#ci_high = np.percentile(accy, q)
+#
+#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
 
 
 # =============================================================================
-#### Model 4 - KNN
-from sklearn import neighbors
-from sklearn.neighbors import KNeighborsClassifier
+#### Model 4 - AdaBoost
+from sklearn import ensemble
 
 
 #Gridsearch, model fit
-k_grid = {"n_neighbors": np.arange(1, 32, 1)}
-knn = GridSearchCV(neighbors.KNeighborsClassifier(), k_grid, cv = 5, n_jobs=-1)
-knn.fit(X_train, y_train)
-knn_cv = knn.best_estimator_
-knn_cv.fit(X_train, y_train)
+n_grid = {"n_estimators": np.arange(1, 50, 1)}
+ada = GridSearchCV(ensemble.AdaBoostClassifier(algorithm='SAMME.R'), n_grid, cv = 5)
+ada.fit(X_train, y_train)
+ada_cv = ada.best_estimator_
+ada_cv.fit(X_train, y_train)
 
 # predict
-knn_pred = knn_cv.predict(X_test)
-knn_prob = knn_cv.predict_proba(X_test)
+ada_pred = ada_cv.predict(X_test)
+ada_prob = ada_cv.predict_proba(X_test)
 
-knn_confusion = confusion_matrix(y_test, knn_pred)
-knn_mis = (1- accuracy_score(y_test, knn_pred)).round(3)
-knn_se = np.sqrt(knn_mis*(1- knn_mis)/len(y_test)).round(3)
-knn_sensi = knn_confusion[1,1]/np.sum(knn_confusion[1,:]).round(3)
-knn_speci = knn_confusion[0,0]/np.sum(knn_confusion[0,:]).round(3)
-knn_auc = roc_auc_score(y_test, knn_prob[:,1]).round(3)
-knn_precision = precision_score(y_test, knn_pred).round(3)
+ada_confusion = confusion_matrix(y_test, ada_pred)
+ada_mis = (1- accuracy_score(y_test, ada_pred)).round(3)
+ada_sensi = ada_confusion[1,1]/np.sum(ada_confusion[1,:]).round(3)
+ada_speci = ada_confusion[0,0]/np.sum(ada_confusion[0,:]).round(3)
+ada_auc = roc_auc_score(y_test, ada_prob[:,1]).round(3)
+ada_precision = precision_score(y_test, ada_pred).round(3)
+ada_auprc= average_precision_score(y_test, ada_prob)
 
-columns = ['KNN']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+columns = ['AdaBoost']
+rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-knn_score = pd.DataFrame([knn_mis, knn_se, knn_sensi, knn_speci, knn_auc, knn_precision], columns = columns, index = rows)
+ada_score = pd.DataFrame([ada_mis, ada_sensi, ada_speci, ada_auc, ada_precision, ada_auprc], columns = columns, index = rows)
+
+## Confidence interval
+#n_iterations = 1000
+#n_size = len(y_test)
+#test = X_test
+#
+#accy = list()
+#for i in range(n_iterations):
+#    test = resample(test, n_samples=n_size)
+#    y_prob = ada_cv.predict_proba(test)
+#    score = accuracy_score(y_test, y_prob)
+#    accy.append(score)
+#
+#alpha = 0.95
+#p = ((1-alpha)/2) * 100
+#ci_low = np.percentile(accy, p)
+#q = (1-((1-alpha)/2)) * 100
+#ci_high = np.percentile(accy, q)
+#
+#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
 
 
-# Confidence interval
-n_iterations = 10000
-n_size = len(y_test)
-test = X_test
-
-accy = list()
-for i in range(n_iterations):
-    test = resample(test, n_samples=n_size)
-    y_prob = knn_cv.predict_proba(test)
-    score = accuracy_score(y_test, y_prob)
-    accy.append(score)
-
-alpha = 0.95
-p = ((1-alpha)/2) * 100
-ci_low = np.percentile(accy, p)
-q = (1-((1-alpha)/2)) * 100
-ci_high = np.percentile(accy, q)
-
-print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+#from statlearning import bootstrap_mean, plot_histogram
+#
+## Try to vary the number of loans/portfolio size
+## The return distribution is negatively skewed for small portfolios
+#loans = 5000
+#
+## Linear stack
+#
+#
+#loss_fp =  -train.loc[train['fully_paid']==0,'return'].mean()
+#
+#
+#expected = y_probs[:,-1]*test['int_rate']+(1-y_probs[:,-1])*(-loss_fp)
+#expected   = expected.sort_values(ascending=False)
+#returns = test.loc[expected.index[:loans],'return'] # return sample for the selected loans
+#
+#mean_boot, ci_low, ci_high = bootstrap_mean(returns, S=10000, alpha=0.01)
+#
+#print('Portfolio size = {}'.format(loans))
+#print('Average return = {0:.2f}'.format(np.mean(returns)))
+#print(r'Bootstrap t confidence interval (99%) = ({0:.2f}, {1:.2f})'.format(ci_low, ci_high))
+#
+#fig, ax = plot_histogram(mean_boot-np.mean(returns))
+#ax.set_title('Bootstrap distribution')
+#plt.show()
+#
+#
+#model = ada_confusion
+#loss_TN = model[0, 0] *0
+#loss_TP = model[1, 1] *(-43.56)
+#loss_FN = model[1, 0] * (45.56)
+#loss_FP = model[0, 1] * (2)
+#
+#
+#loss_ave = [y_prob[:, -1]*(-loss_TP - loss_TN) + y_prob[:, 0]*(-loss_FP - loss_FN)]/len(y_test)
+#
+#
+#mean_boot, ci_low, ci_high = bootstrap_mean(loss_ave, S=10, alpha=0.05)
+#
+#
+#
+#
+#
+#n = len(y_test)
+#tptn =y_prob[:, -1]*(-loss_TP - loss_TN)
+#tptn_ave = tptn/n
+#fpfn = y_prob[:, 0]*(-loss_FP - loss_FN)
+#fpfn_ave = fpfn/n
+#loss_ave = tptn_ave + fpfn_ave
+#
+#
+#
+#from statlearning import bootstrap_mean, plot_histogram
+#
+## Try to vary the number of loans/portfolio size
+## The return distribution is negatively skewed for small portfolios
+#loans = 50
+#
+## Linear stack
+#expected = df['RESP']
+#expected   = expected.sort_values(ascending=False)
+#returns = df.loc[expected.index[:loans],'RESP'] # return sample for the selected loans
+#
+#mean_boot, ci_low, ci_high = bootstrap_mean(returns, S=10, alpha=0.05)
+#
+#
+#
+#
+#
+#
+#loss_ave = (loss_TN + loss_TP + loss_FN + loss_FP)/len(y_test)
+#print(loss_ave)
+#
+#y_prob[:,0]
 
 # =============================================================================
 ### Model 5- Decision Tree
@@ -796,6 +937,7 @@ parameters = {'clf__max_depth': np.arange(2, 50, 1), 'clf__min_samples_leaf': [1
 grid_search = GridSearchCV(pipeline, parameters, cv=5)
 grid_search.fit(X_train, y_train)
 tree = grid_search.best_estimator_
+#print(tree)
 tree.fit(X_train, y_train)
 
 # Predict
@@ -804,44 +946,44 @@ tree_prob = tree.predict_proba(X_test)
 
 tree_confusion = confusion_matrix(y_test, tree_pred)
 tree_mis = (1- accuracy_score(y_test, tree_pred)).round(3)
-tree_se = np.sqrt(tree_mis*(1- tree_mis)/len(y_test)).round(3)
 tree_sensi = tree_confusion[1,1]/np.sum(tree_confusion[1,:]).round(3)
 tree_speci = tree_confusion[0,0]/np.sum(tree_confusion[0,:]).round(3)
 tree_auc = roc_auc_score(y_test, tree_prob[:,1]).round(3)
 tree_precision = precision_score(y_test, tree_pred).round(3)
+tree_auprc= average_precision_score(y_test, tree_prob)
 
 columns = ['Decision Tree_depths']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+rows = ['Error rate',  'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-tree_score = pd.DataFrame([tree_mis, tree_se, tree_sensi, tree_speci, tree_auc, tree_precision], columns = columns, index = rows)
+tree_score = pd.DataFrame([tree_mis,  tree_sensi, tree_speci, tree_auc, tree_precision, tree_auprc], columns = columns, index = rows)
 
 
-# Confidence interval
-n_iterations = 10000
-n_size = len(y_test)
-test = X_test
-
-accy = list()
-for i in range(n_iterations):
-    test = resample(test, n_samples=n_size)
-    y_prob = tree.predict_proba(test)
-    score = accuracy_score(y_test, y_prob)
-    accy.append(score)
-
-alpha = 0.95
-p = ((1-alpha)/2) * 100
-ci_low = np.percentile(accy, p)
-q = (1-((1-alpha)/2)) * 100
-ci_high = np.percentile(accy, q)
-
-print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
-
+## Confidence interval
+#n_iterations = 10000
+#n_size = len(y_test)
+#test = X_test
+#
+#accy = list()
+#for i in range(n_iterations):
+#    test = resample(test, n_samples=n_size)
+#    y_prob = tree.predict_proba(test)
+#    score = accuracy_score(y_test, y_prob)
+#    accy.append(score)
+#
+#alpha = 0.95
+#p = ((1-alpha)/2) * 100
+#ci_low = np.percentile(accy, p)
+#q = (1-((1-alpha)/2)) * 100
+#ci_high = np.percentile(accy, q)
+#
+#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+#
 
 ## =============================================================================
 ### Ensamble
 from sklearn.ensemble import VotingClassifier
 # Voting Classifier
-eclf = VotingClassifier(estimators = [('Logit', logit_l2), ('Naive Bayes', nb), ('kNN', knn), ('Decision Tree', tree), ('Discriminant Analysis', lda)], voting = 'hard')
+eclf = VotingClassifier(estimators = [('Logit', logit_l2), ('Naive Bayes', nb), ('AdaBoost', ada), ('Decision Tree', tree), ('Discriminant Analysis', lda)], voting = 'hard')
 
 eclf.fit(X_train, y_train)
 
@@ -851,41 +993,41 @@ eclf_prob = eclf.predict_proba(X_test)
 
 eclf_confusion = confusion_matrix(y_test, eclf_pred)
 eclf_mis = (1- accuracy_score(y_test, eclf_pred)).round(3)
-eclf_se = np.sqrt(eclf_mis*(1- eclf_mis)/len(y_test)).round(3)
 eclf_sensi = eclf_confusion[1,1]/np.sum(eclf_confusion[1,:]).round(3)
 eclf_speci = eclf_confusion[0,0]/np.sum(eclf_confusion[0,:]).round(3)
 eclf_auc = roc_auc_score(y_test, eclf_prob[:,1]).round(3)
 eclf_precision = precision_score(y_test, eclf_pred).round(3)
+eclf_auprc= average_precision_score(y_test, eclf_prob)
 
 columns = ['Emsamble']
-rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
+rows = ['Error rate',  'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
 
-eclf_score = pd.DataFrame([eclf_mis, eclf_se, eclf_sensi, eclf_speci, eclf_auc, eclf_precision], columns = columns, index = rows)
+eclf_score = pd.DataFrame([eclf_mis, eclf_sensi, eclf_speci, eclf_auc, eclf_precision, eclf_auprc], columns = columns, index = rows)
 
-# Confidence interval
-n_iterations = 10000
-n_size = len(y_test)
-test = X_test
-
-accy = list()
-for i in range(n_iterations):
-    test = resample(test, n_samples=n_size)
-    y_prob = eclf.predict_proba(test)
-    score = accuracy_score(y_test, y_prob)
-    accy.append(score)
-
-alpha = 0.95
-p = ((1-alpha)/2) * 100
-ci_low = np.percentile(accy, p)
-q = (1-((1-alpha)/2)) * 100
-ci_high = np.percentile(accy, q)
-
-print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
+## Confidence interval
+#n_iterations = 10000
+#n_size = len(y_test)
+#test = X_test
+#
+#accy = list()
+#for i in range(n_iterations):
+#    test = resample(test, n_samples=n_size)
+#    y_prob = eclf.predict_proba(test)
+#    score = accuracy_score(y_test, y_prob)
+#    accy.append(score)
+#
+#alpha = 0.95
+#p = ((1-alpha)/2) * 100
+#ci_low = np.percentile(accy, p)
+#q = (1-((1-alpha)/2)) * 100
+#ci_high = np.percentile(accy, q)
+#
+#print('the %.0f%% confidence interval is (%.2f, %.2f)' % (alpha*100, ci_low*100, ci_high*100))
 # =============================================================================
 # =============================================================================
 
 ### Model Evalaution
-summary = pd.concat([nb_score, logit_score, logit_l1_score, logit_l2_score, tree_score, lda_score, qda_score, qda_reg_score, eclf_score], axis=1)                
+summary = pd.concat([nb_score, logit_score, logit_l1_score, logit_l2_score, ada_score, tree_score, lda_score, qda_score, qda_reg_score, eclf_score], axis=1)                
 summary.to_csv('Model evaluation_summary.csv')
 
 
@@ -897,7 +1039,7 @@ print(logit_l2_confusion)
 print(lda_confusion)
 print(qda_confusion)
 print(qda_reg_confusion)
-print(knn_confusion)
+print(ada_confusion)
 print(tree_confusion)
 print(eclf_confusion)
 
@@ -911,8 +1053,8 @@ palette = ['#1F77B4', '#FF7F0E', '#2CA02C', '#DB2728', '#9467BD', '#9467BD']
 
 from sklearn.metrics import roc_curve
 
-labels=['Naive Bayes', 'L2 regularised', 'KNN', 'Decision Tree', 'Ensambled', 'LDA']
-methods=[nb, logit_l2, knn, tree, eclf, lda]
+labels=['Naive Bayes', 'L2 regularised', 'AdaBoost', 'Decision Tree', 'Ensambled', 'LDA']
+methods=[nb, logit_l2, ada, tree, eclf, lda]
 
 fig, ax= plt.subplots(figsize=(9,6))
 
@@ -971,4 +1113,4 @@ fig.savefig('best features.pdf')
 #rows = ['Error rate', 'SE', 'Sensitivity', 'Specificity', 'AUC', 'Precision']
 #
 #rf_score = pd.DataFrame([rf_mis, rf_se, rf_sensi, rf_speci, rf_auc, rf_precision], columns = columns, index = rows)
-
+#
