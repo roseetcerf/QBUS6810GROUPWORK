@@ -455,7 +455,7 @@ nb_sensi = nb_confusion[1,1]/np.sum(nb_confusion[1,:]).round(3)
 nb_speci = nb_confusion[0,0]/np.sum(nb_confusion[0,:]).round(3)
 nb_auc = roc_auc_score(y_test, nb_prob[:,1]).round(3)
 nb_precision = precision_score(y_test, nb_pred).round(3)
-nb_auprc=  average_precision_score(y_test, nb_prob)
+nb_auprc=  average_precision_score(y_test, nb_prob[:,1])
 
 
 columns = ['Combined Naive Bayes']
@@ -519,6 +519,9 @@ loss_FP = model[0, 1] * (2)
 y_prob = logit_prob
 
 
+tao = (loss_FP - loss_TN)/(loss_FP + loss_FN - loss_TP - loss_TN)
+
+
 #loss_ave = [y_prob[:, -1]*(-loss_TP - loss_TN) + y_prob[:, 0]*(-loss_FP - loss_FN)]/len(y_test)
 
 n = len(y_test)
@@ -528,8 +531,11 @@ fpfn = y_prob[:, 0]*(-loss_FP - loss_FN)
 fpfn_ave = fpfn/n
 loss_ave = tptn_ave + fpfn_ave
 
+np.mean(loss_ave)
 
 #loss_ave = (loss_TN + loss_TP + loss_FN + loss_FP)/len(y_test) [不对]
+
+
 
 
 from statlearning import bootstrap_mean, plot_histogram
@@ -583,7 +589,7 @@ logit_l1_sensi = logit_l1_confusion[1,1]/np.sum(logit_l1_confusion[1,:]).round(3
 logit_l1_speci = logit_l1_confusion[0,0]/np.sum(logit_l1_confusion[0,:]).round(3)
 logit_l1_auc = roc_auc_score(y_test, logit_l1_prob[:,1]).round(3)
 logit_l1_precision = precision_score(y_test, logit_l1_pred).round(3)
-logit_l1_auprc= average_precision_score(y_test, logit_l1_prob)
+logit_l1_auprc= average_precision_score(y_test, logit_l1_prob[:,1])
 
 columns = ['L1 regularised']
 rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
@@ -628,7 +634,7 @@ logit_l2_sensi = logit_l2_confusion[1,1]/np.sum(logit_l2_confusion[1,:]).round(3
 logit_l2_speci = logit_l2_confusion[0,0]/np.sum(logit_l2_confusion[0,:]).round(3)
 logit_l2_auc = roc_auc_score(y_test, logit_l2_prob[:,1]).round(3)
 logit_l2_precision = precision_score(y_test, logit_l2_pred).round(3)
-logit_l2_auprc= average_precision_score(y_test, logit_l2_prob)
+logit_l2_auprc= average_precision_score(y_test, logit_l2_prob[:,1])
 
 columns = ['L2 regularised']
 rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
@@ -674,7 +680,7 @@ lda_sensi = lda_confusion[1,1]/np.sum(lda_confusion[1,:]).round(3)
 lda_speci = lda_confusion[0,0]/np.sum(lda_confusion[0,:]).round(3)
 lda_auc = roc_auc_score(y_test, lda_prob[:,1]).round(3)
 lda_precision = precision_score(y_test, lda_pred).round(3)
-lda_auprc= average_precision_score(y_test, lda_prob)
+lda_auprc= average_precision_score(y_test, lda_prob[:,1])
 
 columns = ['LDA']
 rows = ['Error rate','Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
@@ -720,7 +726,7 @@ qda_sensi = qda_confusion[1,1]/np.sum(qda_confusion[1,:]).round(3)
 qda_speci = qda_confusion[0,0]/np.sum(qda_confusion[0,:]).round(3)
 qda_auc = roc_auc_score(y_test, qda_prob[:,1]).round(3)
 qda_precision = precision_score(y_test, qda_pred).round(3)
-qda_auprc= average_precision_score(y_test, qda_prob)
+qda_auprc= average_precision_score(y_test, qda_prob[:,1])
 
 columns = ['QDA']
 rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
@@ -772,7 +778,7 @@ qda_reg_sensi = qda_reg_confusion[1,1]/np.sum(qda_reg_confusion[1,:]).round(3)
 qda_reg_speci = qda_reg_confusion[0,0]/np.sum(qda_reg_confusion[0,:]).round(3)
 qda_reg_auc = roc_auc_score(y_test, qda_reg_prob[:,1]).round(3)
 qda_reg_precision = precision_score(y_test, qda_reg_pred).round(3)
-qda_reg_auprc= average_precision_score(y_test, qda_reg_prob)
+qda_reg_auprc= average_precision_score(y_test, qda_reg_prob[:,1])
 
 columns = ['Regularised QDA']
 rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
@@ -822,7 +828,7 @@ ada_sensi = ada_confusion[1,1]/np.sum(ada_confusion[1,:]).round(3)
 ada_speci = ada_confusion[0,0]/np.sum(ada_confusion[0,:]).round(3)
 ada_auc = roc_auc_score(y_test, ada_prob[:,1]).round(3)
 ada_precision = precision_score(y_test, ada_pred).round(3)
-ada_auprc= average_precision_score(y_test, ada_prob)
+ada_auprc= average_precision_score(y_test, ada_prob[:,1])
 
 columns = ['AdaBoost']
 rows = ['Error rate', 'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
@@ -950,7 +956,7 @@ tree_sensi = tree_confusion[1,1]/np.sum(tree_confusion[1,:]).round(3)
 tree_speci = tree_confusion[0,0]/np.sum(tree_confusion[0,:]).round(3)
 tree_auc = roc_auc_score(y_test, tree_prob[:,1]).round(3)
 tree_precision = precision_score(y_test, tree_pred).round(3)
-tree_auprc= average_precision_score(y_test, tree_prob)
+tree_auprc= average_precision_score(y_test, tree_prob[:,1])
 
 columns = ['Decision Tree_depths']
 rows = ['Error rate',  'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
@@ -997,7 +1003,7 @@ eclf_sensi = eclf_confusion[1,1]/np.sum(eclf_confusion[1,:]).round(3)
 eclf_speci = eclf_confusion[0,0]/np.sum(eclf_confusion[0,:]).round(3)
 eclf_auc = roc_auc_score(y_test, eclf_prob[:,1]).round(3)
 eclf_precision = precision_score(y_test, eclf_pred).round(3)
-eclf_auprc= average_precision_score(y_test, eclf_prob)
+eclf_auprc= average_precision_score(y_test, eclf_prob[:,1])
 
 columns = ['Emsamble']
 rows = ['Error rate',  'Sensitivity', 'Specificity', 'AUC', 'Precision', 'AUPRC']
